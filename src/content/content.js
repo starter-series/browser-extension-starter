@@ -1,6 +1,6 @@
 (() => {
-  chrome.runtime.sendMessage({ type: 'GET_STATE' }, (response) => {
-    if (response?.enabled) {
+  chrome.storage.local.get(['enabled'], (result) => {
+    if (result.enabled !== false) {
       console.log('Extension is active on this page');
     }
   });

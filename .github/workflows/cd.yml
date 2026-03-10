@@ -26,9 +26,7 @@ jobs:
           echo "Deploying v$VERSION"
 
       - name: Build zip
-        run: |
-          mkdir -p dist
-          zip -r dist/extension.zip manifest.json src/ assets/icons/ -x '*.DS_Store'
+        run: npm run build:chrome
 
       - name: Upload to Chrome Web Store
         uses: mnao305/chrome-extension-upload@v5.0.0

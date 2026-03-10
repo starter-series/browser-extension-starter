@@ -14,9 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const enabled = toggle.checked;
     chrome.storage.local.set({ enabled });
     updateStatus(enabled);
-
-    // Notify background script
-    chrome.runtime.sendMessage({ type: 'TOGGLE', enabled });
   });
 
   function updateStatus(enabled) {
