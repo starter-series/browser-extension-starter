@@ -153,6 +153,42 @@ npm test
 
 > **참고:** 기본 콘텐츠 스크립트는 `https://*/*`와 `http://*/*`에 매칭됩니다. 특정 사이트만 필요하다면 `manifest.json`의 `matches`를 좁혀서 권한을 최소화하세요. Chrome Web Store 심사에서 넓은 호스트 권한은 더 엄격하게 검토됩니다.
 
+## WXT / Plasmo 대신 이걸 쓰는 이유
+
+[WXT](https://github.com/nicedayfor/wxt) (9K+ stars)와 [Plasmo](https://github.com/nicedayfor/plasmo) (12K+ stars)는 브라우저 확장 내부를 추상화하는 **프레임워크**입니다. 이 템플릿은 근본적으로 다른 접근입니다:
+
+|  | 이 템플릿 | WXT / Plasmo |
+|---|---|---|
+| 철학 | CI/CD를 갖춘 가벼운 스타터 | 런타임을 포함한 풀 프레임워크 |
+| 빌드 시스템 | 없음 (원본 파일 그대로) | Vite / Parcel (필수) |
+| 학습 곡선 | 브라우저 API를 직접 사용 | 프레임워크 추상화 학습 필요 |
+| CI/CD | 풀 파이프라인 포함 | 미포함 |
+| 의존성 | dev 5개, runtime 0개 | 100개+ |
+| AI/바이브코딩 | LLM이 깔끔한 vanilla JS 생성 | LLM이 프레임워크 규칙을 이해해야 함 |
+| 적합한 용도 | 유틸리티 확장, 스크립트, 간단한 도구 | 멀티 페이지 UI의 복잡한 앱 |
+
+**이 템플릿을 선택하세요:**
+- 확장 프로그램이 실제로 뭘 하는지 한 줄 한 줄 이해하고 싶을 때
+- 프로덕션 CI/CD가 바로 필요할 때 (이걸 제공하는 다른 템플릿은 없습니다)
+- AI 도구로 확장 코드를 생성할 때 — vanilla JS가 가장 깔끔한 AI 출력을 만듭니다
+- 풀 앱이 아니라 유틸리티를 만들 때
+
+**WXT/Plasmo를 선택하세요:**
+- 확장 UI에 React/Vue/Svelte 컴포넌트가 필요할 때
+- 파일 기반 라우팅과 자동 임포트가 필요할 때
+- 복잡한 멀티 페이지 아키텍처를 만들 때
+
+### TypeScript는?
+
+이 템플릿은 빌드 단계 없는 철학을 유지하기 위해 의도적으로 vanilla JavaScript를 사용합니다. TypeScript가 필요하면:
+
+1. `devDependencies`에 `typescript` 추가
+2. `tsconfig.json` 추가
+3. `package.json`에 `tsc` 빌드 스텝 추가
+4. `.js` 파일을 `.ts`로 변경
+
+TypeScript는 강제가 아니라 선택입니다. 많은 확장 프로그램 (콘텐츠 스크립트, 간단한 팝업, 백그라운드 리스너)에는 vanilla JS만으로 충분합니다.
+
 ## 기여
 
 PR 환영합니다. [PR 템플릿](.github/PULL_REQUEST_TEMPLATE.md)을 사용해 주세요.

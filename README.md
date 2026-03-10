@@ -153,6 +153,42 @@ npm test
 
 > **Note:** The default content script matches `https://*/*` and `http://*/*`. If your extension only needs specific sites, narrow the `matches` in `manifest.json` to minimize permissions — Chrome Web Store review is stricter with broad host permissions.
 
+## Why This Over WXT / Plasmo?
+
+[WXT](https://github.com/nicedayfor/wxt) (9K+ stars) and [Plasmo](https://github.com/nicedayfor/plasmo) (12K+ stars) are excellent **frameworks** that abstract away browser extension internals. This template takes a fundamentally different approach:
+
+|  | This template | WXT / Plasmo |
+|---|---|---|
+| Philosophy | Thin starter with CI/CD | Full framework with runtime |
+| Build system | None (raw files) | Vite / Parcel (required) |
+| Learning curve | Read the browser APIs directly | Learn the framework's abstractions |
+| CI/CD | Full pipeline included | Not included |
+| Dependencies | 5 dev, 0 runtime | 100+ |
+| AI/vibe-coding | LLMs generate clean vanilla JS | LLMs must understand framework conventions |
+| Best for | Utility extensions, scripts, simple tools | Complex apps with multi-page UIs |
+
+**Choose this template if:**
+- You want to understand what your extension actually does, line by line
+- You need production CI/CD out of the box (no other template provides this)
+- You're using AI tools to generate extension code — vanilla JS produces the cleanest AI output
+- Your extension is a utility, not a full application
+
+**Choose WXT/Plasmo if:**
+- You need React/Vue/Svelte components in your extension UI
+- You want file-based routing and auto-imports
+- Your extension has complex multi-page architecture
+
+### What about TypeScript?
+
+This template intentionally uses vanilla JavaScript to keep the zero-build-step philosophy. If you need TypeScript:
+
+1. Add `typescript` to devDependencies
+2. Add a `tsconfig.json`
+3. Add a `tsc` build step to `package.json`
+4. Rename `.js` files to `.ts`
+
+This keeps TypeScript opt-in rather than forcing a build pipeline on everyone. For many extensions (content scripts, simple popups, background listeners), vanilla JS is all you need.
+
 ## Contributing
 
 PRs welcome. Please use the [PR template](.github/PULL_REQUEST_TEMPLATE.md).
