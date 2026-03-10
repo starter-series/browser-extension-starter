@@ -98,6 +98,8 @@ See **[docs/OAUTH_SETUP.md](docs/OAUTH_SETUP.md)** for a detailed setup guide.
 4. Add background logic in `src/background/`
 5. Add page injection in `src/content/`
 
+> **Note:** The default content script matches `https://*/*` and `http://*/*`. If your extension only needs specific sites, narrow the `matches` in `manifest.json` to minimize permissions — Chrome Web Store review is stricter with broad host permissions.
+
 ## Part of Starter Series
 
 This repo is part of [starter-series](https://github.com/starter-series) — a collection of modern dev starters with CI/CD included.

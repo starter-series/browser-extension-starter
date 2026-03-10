@@ -4,8 +4,15 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'PING') {
+  if (message.type === 'TOGGLE') {
+    console.log('Extension ' + (message.enabled ? 'enabled' : 'disabled'));
     sendResponse({ status: 'ok' });
   }
-  return true;
+
+  if (message.type === 'GET_STATE') {
+    chrome.storage.local.get(['enabled'], (result) => {
+      sendResponse({ enabled: result.enabled !== false });
+    });
+    return true; // keep channel open for async response
+  }
 });

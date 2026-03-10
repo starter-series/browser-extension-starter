@@ -16,17 +16,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Validate manifest.json
         run: node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8')); console.log('manifest.json is valid')"
 
-      - name: Lint JavaScript
-        run: |
-          npx eslint@8 src/ \
-            --no-eslintrc \
-            --env browser,es2021,webextensions \
-            --parser-options=ecmaVersion:2022 \
-            --rule '{"no-undef":"off","no-unused-vars":"warn","no-redeclare":"error","no-dupe-keys":"error"}' \
-            --max-warnings 50 || true
+      - name: Lint
+        run: npm run lint
 
   test:
     runs-on: ubuntu-latest
@@ -38,7 +35,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install --save-dev jest
+        run: npm ci
 
       - name: Run tests
-        run: npx jest --passWithNoTests
+        run: npm test

@@ -1,6 +1,6 @@
 (() => {
-  chrome.runtime.sendMessage({ type: 'PING' }, (response) => {
-    if (response?.status === 'ok') {
+  chrome.runtime.sendMessage({ type: 'GET_STATE' }, (response) => {
+    if (response?.enabled) {
       console.log('Extension is active on this page');
     }
   });
