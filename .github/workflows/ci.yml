@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  validate:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,22 +20,18 @@ jobs:
         run: npm ci
 
       - name: Validate manifest.json
-        run: node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8')); console.log('manifest.json is valid')"
+        run: |
+          node -e "
+            const m = JSON.parse(require('fs').readFileSync('manifest.json','utf8'));
+            const required = ['manifest_version','name','version'];
+            const missing = required.filter(k => !m[k]);
+            if (missing.length) { console.error('Missing required fields:', missing.join(', ')); process.exit(1); }
+            if (m.manifest_version !== 3) { console.error('manifest_version must be 3'); process.exit(1); }
+            console.log('manifest.json is valid (v' + m.version + ')');
+          "
 
       - name: Lint
         run: npm run lint
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
+      - name: Test
         run: npm test

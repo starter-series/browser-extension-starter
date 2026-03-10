@@ -1,1 +1,12 @@
-/* Content script styles */
+/*
+ * Content script styles.
+ * These styles are injected into every page matched by manifest.json.
+ *
+ * Example:
+ *   .my-extension-overlay {
+ *     position: fixed;
+ *     bottom: 16px;
+ *     right: 16px;
+ *     z-index: 999999;
+ *   }
+ */

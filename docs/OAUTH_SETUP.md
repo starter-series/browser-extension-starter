@@ -111,8 +111,9 @@ You can choose between `default` (public) and `trustedTesters` publish targets.
 ### "access_blocked: app has not completed verification"
 - Same as above — add yourself as a test user in the OAuth consent screen.
 
-### Token expired
-- Refresh tokens don't expire unless you revoke them or change your password. If it stops working, repeat Step 5.
+### Token expired after 7 days
+- If your Google Cloud project is still in **"Testing"** status (not published), refresh tokens expire in 7 days. To fix this, go to **OAuth consent screen** → **Publishing status** → **Publish App**. Published apps' refresh tokens do not expire.
+- If the token is already expired, repeat Step 5 to get a new one.
 
 ### Upload succeeds but publish fails
 - Your extension must have been manually uploaded to CWS at least once before automated publishing works.

@@ -2,7 +2,7 @@
   "name": "browser-extension-starter",
   "private": true,
   "scripts": {
-    "build:chrome": "rm -f dist/chrome.zip && mkdir -p dist && zip -r dist/chrome.zip manifest.json src/ assets/icons/ -x '*.DS_Store'",
+    "build:chrome": "rm -f dist/extension.zip && mkdir -p dist && zip -r dist/extension.zip manifest.json src/ assets/icons/ -x '*.DS_Store'",
     "test": "jest --verbose --passWithNoTests",
     "lint": "eslint src/"
   },
