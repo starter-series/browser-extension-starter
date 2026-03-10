@@ -92,11 +92,13 @@ https://chromewebstore.google.com/detail/my-extension/[EXTENSION_ID]
 
 ## Done
 
-Once secrets are configured, every push to `main` that changes `manifest.json`, `src/**`, or `assets/**` will automatically:
+Once secrets are configured, go to **Actions** tab → **Deploy to Chrome Web Store** → **Run workflow** to:
 
 1. Build the extension zip
 2. Upload to Chrome Web Store
 3. Submit for review
+
+You can choose between `default` (public) and `trustedTesters` publish targets.
 
 ## Troubleshooting
 
