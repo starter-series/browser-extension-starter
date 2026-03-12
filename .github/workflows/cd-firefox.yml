@@ -73,7 +73,7 @@ jobs:
         run: npx web-ext sign --source-dir . --channel "$CHANNEL" --api-key "$AMO_API_KEY" --api-secret "$AMO_API_SECRET"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: firefox-v${{ steps.version.outputs.version }}
           path: dist/extension.zip
