@@ -50,12 +50,17 @@ jobs:
           fi
 
       - name: Validate secrets
+        env:
+          HAS_EXT_ID: ${{ secrets.CWS_EXTENSION_ID != '' }}
+          HAS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID != '' }}
+          HAS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET != '' }}
+          HAS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN != '' }}
         run: |
           MISSING=""
-          if [ -z "${{ secrets.CWS_EXTENSION_ID }}" ]; then MISSING="$MISSING CWS_EXTENSION_ID"; fi
-          if [ -z "${{ secrets.CWS_CLIENT_ID }}" ]; then MISSING="$MISSING CWS_CLIENT_ID"; fi
-          if [ -z "${{ secrets.CWS_CLIENT_SECRET }}" ]; then MISSING="$MISSING CWS_CLIENT_SECRET"; fi
-          if [ -z "${{ secrets.CWS_REFRESH_TOKEN }}" ]; then MISSING="$MISSING CWS_REFRESH_TOKEN"; fi
+          if [ "$HAS_EXT_ID" != "true" ]; then MISSING="$MISSING CWS_EXTENSION_ID"; fi
+          if [ "$HAS_CLIENT_ID" != "true" ]; then MISSING="$MISSING CWS_CLIENT_ID"; fi
+          if [ "$HAS_CLIENT_SECRET" != "true" ]; then MISSING="$MISSING CWS_CLIENT_SECRET"; fi
+          if [ "$HAS_REFRESH_TOKEN" != "true" ]; then MISSING="$MISSING CWS_REFRESH_TOKEN"; fi
           if [ -n "$MISSING" ]; then
             echo "::error::Missing required secrets:$MISSING — See docs/CWS_SETUP.md"
             exit 1

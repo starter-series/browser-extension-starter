@@ -54,10 +54,13 @@ jobs:
           fi
 
       - name: Validate secrets
+        env:
+          HAS_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER != '' }}
+          HAS_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET != '' }}
         run: |
           MISSING=""
-          if [ -z "${{ secrets.AMO_JWT_ISSUER }}" ]; then MISSING="$MISSING AMO_JWT_ISSUER"; fi
-          if [ -z "${{ secrets.AMO_JWT_SECRET }}" ]; then MISSING="$MISSING AMO_JWT_SECRET"; fi
+          if [ "$HAS_JWT_ISSUER" != "true" ]; then MISSING="$MISSING AMO_JWT_ISSUER"; fi
+          if [ "$HAS_JWT_SECRET" != "true" ]; then MISSING="$MISSING AMO_JWT_SECRET"; fi
           if [ -n "$MISSING" ]; then
             echo "::error::Missing required secrets:$MISSING — See docs/AMO_SETUP.md"
             exit 1
