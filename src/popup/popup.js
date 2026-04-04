@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load saved state
   chrome.storage.local.get(['enabled'], (result) => {
+    if (chrome.runtime.lastError) {
+      console.error('Failed to load settings:', chrome.runtime.lastError.message);
+      return;
+    }
     const enabled = result.enabled !== false;
     toggle.checked = enabled;
     updateStatus(enabled);

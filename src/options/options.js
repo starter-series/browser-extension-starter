@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let toastTimer;
 
   chrome.storage.local.get(defaults, (items) => {
+    if (chrome.runtime.lastError) {
+      console.error('Failed to load settings:', chrome.runtime.lastError.message);
+      return;
+    }
     enabled.checked = items.enabled;
     greeting.value = items.greeting;
   });
@@ -20,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
       enabled: enabled.checked,
       greeting: greeting.value,
     }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to save settings:', chrome.runtime.lastError.message);
+        return;
+      }
       clearTimeout(toastTimer);
       toast.classList.add('show');
       toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
