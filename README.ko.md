@@ -19,7 +19,7 @@
 
 > **[Starter Series](https://github.com/starter-series/starter-series)** — 매번 AI한테 CI/CD 설명하지 마세요. clone하고 바로 시작하세요.
 >
-> [Docker Deploy](https://github.com/starter-series/docker-deploy-starter) · [Discord Bot](https://github.com/starter-series/discord-bot-starter) · [Telegram Bot](https://github.com/starter-series/telegram-bot-starter) · [Browser Extension](https://github.com/starter-series/browser-extension-starter) · [Electron App](https://github.com/starter-series/electron-app-starter) · [npm Package](https://github.com/starter-series/npm-package-starter) · [React Native](https://github.com/starter-series/react-native-starter) · [VS Code Extension](https://github.com/starter-series/vscode-extension-starter) · [MCP Server](https://github.com/starter-series/mcp-server-starter) · [Cloudflare Pages](https://github.com/starter-series/cloudflare-pages-starter)
+> [Docker Deploy](https://github.com/starter-series/docker-deploy-starter) · [Discord Bot](https://github.com/starter-series/discord-bot-starter) · [Telegram Bot](https://github.com/starter-series/telegram-bot-starter) · **Browser Extension** · [Electron App](https://github.com/starter-series/electron-app-starter) · [npm Package](https://github.com/starter-series/npm-package-starter) · [React Native](https://github.com/starter-series/react-native-starter) · [VS Code Extension](https://github.com/starter-series/vscode-extension-starter) · [MCP Server](https://github.com/starter-series/mcp-server-starter) · [Python MCP Server](https://github.com/starter-series/python-mcp-server-starter) · [Cloudflare Pages](https://github.com/starter-series/cloudflare-pages-starter)
 
 ---
 
@@ -170,7 +170,7 @@ npm test
 
 ## WXT / Plasmo 대신 이걸 쓰는 이유
 
-[WXT](https://github.com/nicedayfor/wxt) (9K+ stars)와 [Plasmo](https://github.com/nicedayfor/plasmo) (12K+ stars)는 브라우저 확장 내부를 추상화하는 **프레임워크**입니다. 이 템플릿은 근본적으로 다른 접근입니다:
+[WXT](https://github.com/wxt-dev/wxt)와 [Plasmo](https://github.com/PlasmoHQ/plasmo)는 브라우저 확장 내부를 추상화하는 **프레임워크**입니다. 이 템플릿은 근본적으로 다른 접근입니다:
 
 |  | 이 템플릿 | WXT / Plasmo |
 |---|---|---|
@@ -178,7 +178,7 @@ npm test
 | 빌드 시스템 | 없음 (원본 파일 그대로) | Vite / Parcel (필수) |
 | 학습 곡선 | 브라우저 API를 직접 사용 | 프레임워크 추상화 학습 필요 |
 | CI/CD | 풀 파이프라인 포함 | 미포함 |
-| 의존성 | dev 5개, runtime 0개 | 100개+ |
+| 의존성 | dev 7개, runtime 0개 | 100개+ |
 | AI/바이브코딩 | LLM이 깔끔한 vanilla JS 생성 | LLM이 프레임워크 규칙을 이해해야 함 |
 | 적합한 용도 | 유틸리티 확장, 스크립트, 간단한 도구 | 멀티 페이지 UI의 복잡한 앱 |
 
