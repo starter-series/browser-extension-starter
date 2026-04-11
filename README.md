@@ -19,7 +19,7 @@ Build your extension. Push to deploy.
 
 > **Part of [Starter Series](https://github.com/starter-series/starter-series)** — Stop explaining CI/CD to your AI every time. Clone and start.
 >
-> [Docker Deploy](https://github.com/starter-series/docker-deploy-starter) · [Discord Bot](https://github.com/starter-series/discord-bot-starter) · [Telegram Bot](https://github.com/starter-series/telegram-bot-starter) · [Browser Extension](https://github.com/starter-series/browser-extension-starter) · [Electron App](https://github.com/starter-series/electron-app-starter) · [npm Package](https://github.com/starter-series/npm-package-starter) · [React Native](https://github.com/starter-series/react-native-starter) · [VS Code Extension](https://github.com/starter-series/vscode-extension-starter) · [MCP Server](https://github.com/starter-series/mcp-server-starter) · [Cloudflare Pages](https://github.com/starter-series/cloudflare-pages-starter)
+> [Docker Deploy](https://github.com/starter-series/docker-deploy-starter) · [Discord Bot](https://github.com/starter-series/discord-bot-starter) · [Telegram Bot](https://github.com/starter-series/telegram-bot-starter) · **Browser Extension** · [Electron App](https://github.com/starter-series/electron-app-starter) · [npm Package](https://github.com/starter-series/npm-package-starter) · [React Native](https://github.com/starter-series/react-native-starter) · [VS Code Extension](https://github.com/starter-series/vscode-extension-starter) · [MCP Server](https://github.com/starter-series/mcp-server-starter) · [Python MCP Server](https://github.com/starter-series/python-mcp-server-starter) · [Cloudflare Pages](https://github.com/starter-series/cloudflare-pages-starter)
 
 ---
 
@@ -170,7 +170,7 @@ npm test
 
 ## Why This Over WXT / Plasmo?
 
-[WXT](https://github.com/nicedayfor/wxt) (9K+ stars) and [Plasmo](https://github.com/nicedayfor/plasmo) (12K+ stars) are excellent **frameworks** that abstract away browser extension internals. This template takes a fundamentally different approach:
+[WXT](https://github.com/wxt-dev/wxt) and [Plasmo](https://github.com/PlasmoHQ/plasmo) are excellent **frameworks** that abstract away browser extension internals. This template takes a fundamentally different approach:
 
 |  | This template | WXT / Plasmo |
 |---|---|---|
@@ -178,7 +178,7 @@ npm test
 | Build system | None (raw files) | Vite / Parcel (required) |
 | Learning curve | Read the browser APIs directly | Learn the framework's abstractions |
 | CI/CD | Full pipeline included | Not included |
-| Dependencies | 5 dev, 0 runtime | 100+ |
+| Dependencies | 7 dev, 0 runtime | 100+ |
 | AI/vibe-coding | LLMs generate clean vanilla JS | LLMs must understand framework conventions |
 | Best for | Utility extensions, scripts, simple tools | Complex apps with multi-page UIs |
 

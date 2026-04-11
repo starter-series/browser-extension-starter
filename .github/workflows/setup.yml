@@ -35,8 +35,8 @@ jobs:
 
           ## Required
           - [ ] Update `manifest.json` — change `name`, `description`
-          - [ ] Replace icons in `icons/` (16, 48, 128 px)
-          - [ ] Update popup HTML/CSS/JS in `popup/`
+          - [ ] Replace icons in `assets/icons/` (16, 32, 48, 128 px)
+          - [ ] Update popup HTML/JS in `src/popup/`
 
           ## Chrome Web Store
           Follow [docs/CWS_SETUP.md](docs/CWS_SETUP.md) to:
@@ -51,7 +51,7 @@ jobs:
           - [ ] Add secret: `AMO_JWT_SECRET`
 
           ## Recommended
-          - [ ] Write tests in `tests/`
+          - [ ] Add Jest tests (e.g. `src/**/*.test.js`)
           - [ ] Delete this issue when done
           EOF
           )"
