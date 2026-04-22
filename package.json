@@ -10,7 +10,7 @@
     "version:patch": "node scripts/bump-version.js patch",
     "version:minor": "node scripts/bump-version.js minor",
     "version:major": "node scripts/bump-version.js major",
-    "test": "jest --verbose --passWithNoTests",
+    "test": "jest --verbose",
     "lint": "eslint src/",
     "lint:css": "stylelint \"src/**/*.css\""
   },
