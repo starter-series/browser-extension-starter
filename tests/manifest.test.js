@@ -1,8 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-
-const root = path.resolve(__dirname, '..');
-const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'));
+const { manifest, ALLOWED_PERMISSIONS, exists } = require('./helpers');
 
 describe('manifest.json', () => {
   test('is Manifest V3', () => {
@@ -15,11 +11,9 @@ describe('manifest.json', () => {
     expect(manifest.description).toEqual(expect.any(String));
   });
 
-  test('only requests minimal permissions', () => {
-    const permissions = manifest.permissions || [];
-    // Storage is expected; anything else should be deliberate.
-    const allowed = new Set(['storage', 'activeTab', 'alarms', 'notifications']);
-    for (const p of permissions) {
+  test('only requests permissions from the allowlist', () => {
+    const allowed = new Set(ALLOWED_PERMISSIONS);
+    for (const p of manifest.permissions || []) {
       expect(allowed.has(p)).toBe(true);
     }
   });
@@ -40,7 +34,7 @@ describe('manifest.json', () => {
     ].filter(Boolean);
 
     for (const ref of refs) {
-      expect(fs.existsSync(path.join(root, ref))).toBe(true);
+      expect(exists(ref)).toBe(true);
     }
   });
 
@@ -48,14 +42,12 @@ describe('manifest.json', () => {
     const sizes = Object.entries(manifest.icons || {});
     expect(sizes.length).toBeGreaterThan(0);
     for (const [, iconPath] of sizes) {
-      expect(fs.existsSync(path.join(root, iconPath))).toBe(true);
+      expect(exists(iconPath)).toBe(true);
     }
   });
 
-  test('content script matches use https scheme', () => {
-    const matches = manifest.content_scripts?.[0]?.matches || [];
-    // http://*/* is okay for dev but should be audited — we accept http/https explicitly.
-    for (const m of matches) {
+  test('content script matches use http or https scheme', () => {
+    for (const m of manifest.content_scripts?.[0]?.matches || []) {
       expect(m).toMatch(/^https?:\/\//);
     }
   });

@@ -1,11 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-
-const root = path.resolve(__dirname, '..');
-
-function readSrc(p) {
-  return fs.readFileSync(path.join(root, p), 'utf8');
-}
+const { pkg, readSrc } = require('./helpers');
 
 describe('source files', () => {
   test('popup.js wires DOMContentLoaded and reads chrome.storage', () => {
@@ -21,8 +14,9 @@ describe('source files', () => {
   });
 
   test('background service worker is syntactically valid JS', () => {
+    // MV3 service workers are classic scripts (no ES module top-level import/export),
+    // so Function() can parse them. If you migrate to modules, replace with a real parser.
     const src = readSrc('src/background/background.js');
-    // Node can parse it as a module — if not, this throws.
     expect(() => new Function(src)).not.toThrow();
   });
 
@@ -32,7 +26,8 @@ describe('source files', () => {
   });
 
   test('chrome.runtime.lastError is checked after storage callbacks', () => {
-    // Common MV3 foot-gun: silent failures when lastError is not consulted.
+    // Common MV3 foot-gun: storage callbacks silently swallow errors when
+    // lastError is not consulted.
     const popup = readSrc('src/popup/popup.js');
     const options = readSrc('src/options/options.js');
     expect(popup).toMatch(/chrome\.runtime\.lastError/);
@@ -41,8 +36,6 @@ describe('source files', () => {
 });
 
 describe('package metadata', () => {
-  const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-
   test('is private (extensions are not published to npm)', () => {
     expect(pkg.private).toBe(true);
   });
