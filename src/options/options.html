@@ -4,76 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Extension Settings</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      width: 360px;
-      padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14px;
-      color: #1a1a1a;
-    }
-    h1 { font-size: 18px; margin-bottom: 16px; }
-    .setting {
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-    .setting label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    .setting-text label {
-      display: block;
-      margin-bottom: 6px;
-    }
-    .setting-text input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 13px;
-    }
-    .setting-text input:focus {
-      outline: none;
-      border-color: #4285f4;
-    }
-    .toast {
-      margin-top: 12px;
-      padding: 8px 12px;
-      background: #f0fdf4;
-      color: #16a34a;
-      border-radius: 8px;
-      font-size: 13px;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .toast.show { opacity: 1; }
-  </style>
+  <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <h1>Settings</h1>
+  <p class="subtitle">Synced to your browser profile via <code>chrome.storage.sync</code>.</p>
 
-  <div class="setting">
-    <label>
-      <input type="checkbox" id="enabled" checked>
-      Enable extension
-    </label>
-  </div>
+  <form id="settings-form" novalidate>
+    <div class="setting setting-inline">
+      <label>
+        <input type="checkbox" id="highlightEnabled">
+        Enable highlighting
+      </label>
+      <span class="hint">When off, the content script exits early on every page.</span>
+    </div>
 
-  <div class="setting setting-text">
-    <label for="greeting">Custom greeting</label>
-    <input type="text" id="greeting" placeholder="Hello from My Extension!">
-  </div>
+    <div class="setting setting-color">
+      <label for="highlightColor">Highlight color</label>
+      <div class="color-row">
+        <span class="color-preview" id="colorPreview" aria-hidden="true"></span>
+        <input
+          type="text"
+          id="highlightColor"
+          inputmode="text"
+          autocomplete="off"
+          spellcheck="false"
+          pattern="^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+          aria-describedby="highlightColor-error"
+        >
+      </div>
+      <span class="hint">Hex color, e.g. <code>#FFEB3B</code>.</span>
+      <span class="error" id="highlightColor-error" role="alert"></span>
+    </div>
 
-  <div class="toast" id="toast">Settings saved</div>
+    <div class="setting setting-textarea">
+      <label for="blockedDomains">Blocked domains</label>
+      <textarea
+        id="blockedDomains"
+        placeholder="example.com&#10;news.example.org"
+        spellcheck="false"
+        aria-describedby="blockedDomains-error"
+      ></textarea>
+      <span class="hint">One hostname per line. The extension will skip these pages.</span>
+      <span class="error" id="blockedDomains-error" role="alert"></span>
+    </div>
 
+    <div class="actions">
+      <button type="submit" id="save">Save</button>
+      <span class="status" id="status" role="status" aria-live="polite"></span>
+    </div>
+  </form>
+
+  <script src="../settings.js"></script>
   <script src="options.js"></script>
 </body>
 </html>
