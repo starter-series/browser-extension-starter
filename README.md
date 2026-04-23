@@ -73,6 +73,7 @@ npm run build:chrome
 - **Security** — CI warns on risky permissions, broad host access, and dependency vulnerabilities
 - **Dev mode** — `npm run dev` for live-reload with `web-ext`
 - **Starter code** — Popup with toggle + options page + background + content script
+- **Settings storage example** — `chrome.storage.sync` end-to-end: options form → content script → live updates
 - **Store-ready** — OAuth setup guide + privacy policy template
 - **Template setup** — Auto-creates setup checklist issue on first use
 
@@ -155,6 +156,26 @@ npm run lint        # JS
 npm run lint:css    # CSS
 npm test
 ```
+
+## Settings storage
+
+The template ships with a small **`chrome.storage.sync`** example that wires an options page, a content script, and a background service worker together. It's the canonical answer to "how do I store settings and read them from a content script?"
+
+**Where to look:**
+
+| File | Role |
+|------|------|
+| `src/settings.js` | Shared UMD module: `DEFAULTS`, `getSettings()`, validators. Same code runs in the options page, content script, and tests. |
+| `src/options/options.html` + `options.js` + `options.css` | Full options page with 3 settings (boolean toggle, hex color, newline-separated blocked-domains list), hex/domain validation, and an `aria-live` status region. |
+| `src/content/content.js` | Loads settings, bails out if disabled or the host is blocklisted, and reacts live to `chrome.storage.onChanged`. |
+| `src/background/background.js` | On `onInstalled` (reason `install`), seeds defaults into `chrome.storage.sync` only for keys the user hasn't already set. |
+| `tests/settings.test.js` | Jest coverage for defaults, stored values, invalid-value coercion, and host-match edge cases. |
+
+**Open the Options page in a tab:** `options_ui.open_in_tab` is set to `true`, so Chrome opens it as a full tab (right-click extension icon → **Options**, or `chrome://extensions` → **Details** → **Extension options**).
+
+**Why sync and not local?** [`chrome.storage.sync`](https://developer.chrome.com/docs/extensions/reference/api/storage) roams the user's preferences with their Google/Firefox profile. Use `local` for caches or device-specific state, `session` for values that die with the browser session.
+
+**Firefox compatibility.** Modern Firefox (109+, which this template targets via `browser_specific_settings.gecko.strict_min_version`) exposes `chrome.storage.sync` directly — no [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill) needed. Add the polyfill only if you need promise-returning APIs without callbacks, or if you must support Firefox < 109.
 
 ## Customization
 

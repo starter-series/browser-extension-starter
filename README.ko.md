@@ -73,6 +73,7 @@ npm run build:chrome
 - **보안** — 위험 권한, 넓은 호스트 접근, 의존성 취약점 경고
 - **개발 모드** — `npm run dev`로 `web-ext` 라이브 리로드
 - **스타터 코드** — 토글 팝업 + 옵션 페이지 + 백그라운드 + 콘텐츠 스크립트
+- **설정 저장 예제** — `chrome.storage.sync`로 옵션 페이지 → 콘텐츠 스크립트 → 실시간 업데이트까지 완전 연결
 - **스토어 제출 지원** — OAuth 설정 가이드 + 개인정보처리방침 템플릿
 - **템플릿 셋업** — 첫 사용 시 설정 체크리스트 이슈 자동 생성
 
@@ -155,6 +156,26 @@ npm run lint        # JS
 npm run lint:css    # CSS
 npm test
 ```
+
+## 설정 저장
+
+이 템플릿은 옵션 페이지 · 콘텐츠 스크립트 · 백그라운드 서비스 워커를 하나로 묶는 **`chrome.storage.sync`** 예제를 포함합니다. "설정을 저장하고 콘텐츠 스크립트에서 읽으려면 어떻게 해야 하나요?"에 대한 기본형 답입니다.
+
+**파일 구성:**
+
+| 파일 | 역할 |
+|------|------|
+| `src/settings.js` | 공유 UMD 모듈: `DEFAULTS`, `getSettings()`, 검증 함수. 옵션 페이지 · 콘텐츠 스크립트 · 테스트에서 동일한 코드를 사용합니다. |
+| `src/options/options.html` + `options.js` + `options.css` | 설정 3개 (불리언 토글, HEX 색상, 줄바꿈 구분 차단 도메인)를 가진 옵션 페이지. HEX/도메인 검증 + `aria-live` 상태 표시. |
+| `src/content/content.js` | 설정 로드 후 비활성/차단 도메인이면 즉시 종료. `chrome.storage.onChanged`로 실시간 반영. |
+| `src/background/background.js` | `onInstalled` (reason `install`) 때 사용자가 설정하지 않은 키에만 기본값을 주입. |
+| `tests/settings.test.js` | 기본값, 저장값, 잘못된 값 교정, 호스트 매칭 엣지 케이스를 Jest로 검증. |
+
+**옵션 페이지를 탭으로 열기:** `options_ui.open_in_tab`이 `true`여서 크롬이 전체 탭으로 엽니다 (확장 아이콘 우클릭 → **Options**, 또는 `chrome://extensions` → **상세정보** → **확장 프로그램 옵션**).
+
+**왜 sync? local은?** [`chrome.storage.sync`](https://developer.chrome.com/docs/extensions/reference/api/storage)는 사용자의 Google/Firefox 프로필을 따라 설정이 동기화됩니다. `local`은 캐시나 기기별 상태에, `session`은 브라우저 세션이 끝나면 사라져도 되는 값에 쓰세요.
+
+**Firefox 호환성.** 이 템플릿이 타겟하는 Firefox 109+ (`browser_specific_settings.gecko.strict_min_version` 기준)는 `chrome.storage.sync`를 네이티브로 지원하므로 [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill)은 **불필요**합니다. Promise 반환 API가 필요하거나 Firefox < 109를 지원해야 한다면 그때 추가하세요.
 
 ## 커스터마이징
 

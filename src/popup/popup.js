@@ -2,22 +2,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle');
   const status = document.getElementById('status');
 
-  // Load saved state
-  chrome.storage.local.get(['enabled'], (result) => {
+  // Popup reads/writes the same chrome.storage.sync key as the options page
+  // so toggling from the popup stays in lockstep with the full settings UI.
+  chrome.storage.sync.get({ highlightEnabled: true }, (result) => {
     if (chrome.runtime.lastError) {
       console.error('Failed to load settings:', chrome.runtime.lastError.message);
       return;
     }
-    const enabled = result.enabled !== false;
+    const enabled = result.highlightEnabled !== false;
     toggle.checked = enabled;
     updateStatus(enabled);
   });
 
-  // Handle toggle
   toggle.addEventListener('change', () => {
     const enabled = toggle.checked;
-    chrome.storage.local.set({ enabled });
-    updateStatus(enabled);
+    chrome.storage.sync.set({ highlightEnabled: enabled }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to save setting:', chrome.runtime.lastError.message);
+        return;
+      }
+      updateStatus(enabled);
+    });
   });
 
   function updateStatus(enabled) {
