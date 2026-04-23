@@ -25,6 +25,23 @@ Build your extension. Push to deploy.
 
 ## Quick Start
 
+**Via [create-starter](https://github.com/starter-series/create-starter)** (recommended):
+
+```bash
+npx @starter-series/create my-extension --template browser-extension
+cd my-extension && npm install && npm run dev
+```
+
+**Or clone directly:**
+
+```bash
+git clone https://github.com/starter-series/browser-extension-starter my-extension
+cd my-extension && npm install && npm run dev
+```
+
+<details>
+<summary>Manual setup (step-by-step)</summary>
+
 ```bash
 # 1. Click "Use this template" on GitHub (or clone)
 git clone https://github.com/starter-series/browser-extension-starter.git my-extension
@@ -39,6 +56,8 @@ npm install
 # 4. Build zip for store
 npm run build:chrome
 ```
+
+</details>
 
 ## What's Included
 

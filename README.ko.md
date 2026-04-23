@@ -25,6 +25,23 @@
 
 ## 빠른 시작
 
+**[create-starter](https://github.com/starter-series/create-starter) 사용** (권장):
+
+```bash
+npx @starter-series/create my-extension --template browser-extension
+cd my-extension && npm install && npm run dev
+```
+
+**또는 직접 clone:**
+
+```bash
+git clone https://github.com/starter-series/browser-extension-starter my-extension
+cd my-extension && npm install && npm run dev
+```
+
+<details>
+<summary>수동 설정 (단계별)</summary>
+
 ```bash
 # 1. GitHub에서 "Use this template" 클릭 (또는 clone)
 git clone https://github.com/starter-series/browser-extension-starter.git my-extension
@@ -39,6 +56,8 @@ npm install
 # 4. 스토어용 zip 빌드
 npm run build:chrome
 ```
+
+</details>
 
 ## 포함된 구성
 
