@@ -60,6 +60,25 @@ describe('manifest.json', () => {
     }
   });
 
+  test('content script matches do not use wildcard hosts (must be narrowed before publish)', () => {
+    const matches = manifest.content_scripts?.[0]?.matches || [];
+    for (const m of matches) {
+      // CWS rejects wildcard hosts without strong justification. Narrow to
+      // specific origins and use optional_host_permissions for opt-in expansion.
+      expect(m).not.toMatch(/^https?:\/\/\*\/\*$/);
+      expect(m).not.toBe('<all_urls>');
+    }
+  });
+
+  test('declares CSP for extension_pages (no remote scripts, no eval)', () => {
+    const csp = manifest.content_security_policy?.extension_pages;
+    expect(csp).toBeTruthy();
+    expect(csp).toMatch(/script-src 'self'/);
+    expect(csp).toMatch(/object-src 'self'/);
+    expect(csp).not.toMatch(/'unsafe-eval'/);
+    expect(csp).not.toMatch(/'unsafe-inline'/);
+  });
+
   test('Firefox gecko id is present for cross-browser publish', () => {
     expect(manifest.browser_specific_settings?.gecko?.id).toBeTruthy();
   });

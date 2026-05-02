@@ -19,11 +19,13 @@
   "background": {
     "service_worker": "src/background/background.js"
   },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+  },
   "content_scripts": [
     {
       "matches": [
-        "https://*/*",
-        "http://*/*"
+        "https://example.com/*"
       ],
       "js": [
         "src/settings.js",
@@ -33,6 +35,10 @@
         "src/content/content.css"
       ]
     }
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
   ],
   "options_ui": {
     "page": "src/options/options.html",
