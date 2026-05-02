@@ -2,7 +2,7 @@
   "name": "browser-extension-starter",
   "private": true,
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "web-ext run -t chromium --source-dir . --start-url chrome://extensions",
