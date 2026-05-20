@@ -23,6 +23,16 @@ Build your extension. Push to deploy.
 
 ---
 
+## Status & Scope
+
+- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with Jest coverage gates (≥85% statements/lines, ≥95% functions, ≥65% branches; current: 91.89% / 100% / 75%), version-bump scripts, live-reload via `web-ext`, privacy-policy template.
+- **Planned** — none on a public roadmap. This is a starter, not a product; features land when a downstream extension needs them.
+- **Design intent** — Zero build step, vanilla JS, raw browser APIs. The point is to ship a working extension on day one and let an LLM read the code without first learning a framework. Coverage gates are baseline-aware (anchored to the current numbers, not aspirational) — they catch regressions, not author shame.
+- **Non-goals** — Bundling (Vite/Parcel/webpack), TypeScript by default, UI frameworks (React/Vue/Svelte), single-page-app routing, opinionated state libraries. Those are real needs — they belong in [WXT](https://github.com/wxt-dev/wxt) or [Plasmo](https://github.com/PlasmoHQ/plasmo). See the comparison table below.
+- **Redacted** — none. Template ships no private data, no embedded credentials, no third-party identifiers.
+
+---
+
 ## Quick Start
 
 **Via [create-starter](https://github.com/starter-series/create-starter)** (recommended):
