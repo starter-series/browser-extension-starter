@@ -15,10 +15,12 @@ We will respond within 48 hours and work with you to resolve the issue.
 This template includes automated security checks in CI:
 
 - **Dependency audit** — `npm audit` on every push (HIGH/CRITICAL threshold)
-- **Secret leak detection** — [gitleaks](https://github.com/gitleaks/gitleaks) scans every commit
+- **Secret leak detection** — [gitleaks](https://github.com/gitleaks/gitleaks) scans every commit (SHA-pinned binary, checksum-verified)
+- **GitHub-side secret scanning** — repo-level secret scanning + push protection enabled, plus Dependabot security updates
 - **Dependency updates** — [Dependabot](https://docs.github.com/en/code-security/dependabot) monitors for vulnerable dependencies
 - **Permission audit** — CI warns on risky browser permissions (debugger, cookies, <all_urls>)
 - **Manifest validation** — Verifies MV3 compliance on every push
+- **Build provenance** — CD workflows attach SLSA build provenance attestations to `dist/extension.zip` via [actions/attest-build-provenance](https://github.com/actions/attest-build-provenance), so downstream auditors can verify the artifact came from this repo's CI
 
 ## Best Practices
 

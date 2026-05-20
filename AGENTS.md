@@ -64,3 +64,4 @@ Setup guides: docs/CWS_SETUP.md, docs/OAUTH_SETUP.md, docs/AMO_SETUP.md
 - Permission audit in CI warns but doesn't block (informational)
 - Chrome and Firefox share the same manifest.json (gecko settings in browser_specific_settings)
 - `web-ext` used for dev (live reload) and Firefox builds
+- **Telemetry seam**: if you add usage telemetry, `src/background/background.js` is the natural entry — it's the long-lived service worker that sees install/update lifecycle events and can fan out to a backend. The popup and content scripts are too short-lived to batch reliably. Whatever you do, document the data boundary in `docs/PRIVACY_POLICY_TEMPLATE.md`.
