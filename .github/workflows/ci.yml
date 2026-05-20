@@ -49,11 +49,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Check licenses
-        # Pin license-checker to the last published version (25.0.1, 2019)
-        # so a future hijack of the package can't silently weaken this
-        # gate. The original project is no longer actively maintained,
-        # but its license-extraction behavior is frozen and adequate for
-        # this starter's needs.
+        # Pinned to 25.0.1: package is dormant, so a future hijack can't weaken this gate.
         run: npx license-checker@25.0.1 --failOn "GPL-2.0;GPL-3.0;AGPL-3.0"
 
       - name: Validate manifest and audit permissions
