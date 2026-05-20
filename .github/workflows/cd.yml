@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   ci:
@@ -27,6 +27,10 @@ jobs:
     needs: ci
     environment: production
     runs-on: ubuntu-latest
+    permissions:
+      contents: write       # softprops/action-gh-release creates the tag + release
+      id-token: write       # OIDC for attestation signing
+      attestations: write   # actions/attest-build-provenance
     steps:
       - uses: actions/checkout@v6
         with:
@@ -71,8 +75,20 @@ jobs:
       - name: Build zip
         run: npm run build:chrome
 
+      - name: Attest build provenance
+        # SLSA build provenance for dist/extension.zip — lets downstream
+        # auditors verify the zip uploaded to Chrome Web Store came from
+        # this exact workflow run, not from a tampered local build.
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: 'dist/extension.zip'
+
       - name: Upload to Chrome Web Store
-        uses: mnao305/chrome-extension-upload@v6.0.0
+        # SHA-pinned per supply-chain hygiene: this is a third-party
+        # action published by an individual maintainer, so a moving tag
+        # (`@v6.0.0`) could be force-pushed to inject malicious code.
+        # Dependabot's `github-actions` group keeps the SHA fresh.
+        uses: mnao305/chrome-extension-upload@fdfe79400af990f5145a319e834aee64907ccff4 # v6.0.0
         with:
           file-path: dist/extension.zip
           extension-id: ${{ secrets.CWS_EXTENSION_ID }}
@@ -83,7 +99,8 @@ jobs:
           publish-target: ${{ inputs.publish_target }}
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        # SHA-pinned (see note above on third-party action hygiene).
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
