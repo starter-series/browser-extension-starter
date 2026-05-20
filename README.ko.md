@@ -25,7 +25,7 @@
 
 ## 상태와 범위 (Status & Scope)
 
-- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제, Jest 커버리지 게이트(statements/lines ≥85%, functions ≥95%, branches ≥65%; 현재 91.89% / 100% / 75%), 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿.
+- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제, Jest 커버리지 게이트(statements/lines ≥85%, functions ≥95%, branches ≥65%), 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿.
 - **계획된 것 (Planned)** — 공개 로드맵 없음. 이 저장소는 프로덕트가 아니라 스타터입니다. 하위 확장 프로그램에서 필요해질 때 기능을 추가합니다.
 - **설계 의도 (Design intent)** — 빌드 단계 없음, 바닐라 JS, 브라우저 API 직접 사용. 목표는 첫날부터 동작하는 확장을 출하하는 것, 그리고 LLM이 프레임워크를 먼저 배우지 않고도 코드를 읽을 수 있게 하는 것입니다. 커버리지 게이트는 현재 수치를 기준선으로 잡은 baseline-aware 방식이며, 회귀를 잡기 위한 장치이지 저자에게 부담을 주려는 목적은 아닙니다.
 - **하지 않기로 한 것 (Non-goals)** — 번들러(Vite/Parcel/webpack), 기본 TypeScript, UI 프레임워크(React/Vue/Svelte), SPA 라우팅, 상태 관리 라이브러리. 이런 요구가 실재한다는 점은 인정합니다 — 그 경우 [WXT](https://github.com/wxt-dev/wxt)나 [Plasmo](https://github.com/PlasmoHQ/plasmo)를 사용하시기 바랍니다. 아래 비교표를 참고하십시오.
