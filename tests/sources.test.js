@@ -1,3 +1,16 @@
+/**
+ * Structural smoke tests.
+ *
+ * These tests read src/*.js as strings and check for required substrings
+ * or that the file parses as JavaScript via `new Function(src)`. They
+ * catch obviously-broken files (missing storage calls, missing
+ * lastError handling, syntax errors) but do NOT verify the matched
+ * code paths actually run correctly. Real behavior coverage lives in
+ * tests/settings.test.js (unit tests on src/settings.js).
+ *
+ * If you add real chrome-API mocking later, migrate the checks here
+ * into proper unit tests and shrink this file.
+ */
 const fs = require('fs');
 const path = require('path');
 
@@ -7,7 +20,7 @@ function readSrc(p) {
   return fs.readFileSync(path.join(root, p), 'utf8');
 }
 
-describe('source files', () => {
+describe('source files (structural)', () => {
   test('popup.js wires DOMContentLoaded and reads chrome.storage.sync', () => {
     const src = readSrc('src/popup/popup.js');
     expect(src).toMatch(/addEventListener\(\s*['"]DOMContentLoaded['"]/);
@@ -52,15 +65,18 @@ describe('source files', () => {
   });
 });
 
-describe('package metadata', () => {
+describe('package metadata (structural)', () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 
   test('is private (extensions are not published to npm)', () => {
     expect(pkg.private).toBe(true);
   });
 
-  test('requires Node >=20', () => {
-    expect(pkg.engines?.node).toMatch(/>=\s*(2[0-9]|[3-9]\d)/);
+  test('requires Node >=22 (current LTS floor)', () => {
+    // Pinned tight to the actual declared floor — a lazy bump back to
+    // an EOL Node version (e.g. >=20 after April 2026) should fail
+    // this test, not pass it.
+    expect(pkg.engines?.node).toMatch(/>=\s*22/);
   });
 
   test('declares lint, test, and build:chrome scripts', () => {
