@@ -37,8 +37,7 @@
     },
     "coverageReporters": [
       "text",
-      "text-summary",
-      "json-summary"
+      "text-summary"
     ]
   },
   "overrides": {
