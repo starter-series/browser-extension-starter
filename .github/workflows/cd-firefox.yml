@@ -73,7 +73,14 @@ jobs:
           fi
 
       - name: Build
-        run: npx web-ext build --source-dir . --artifacts-dir dist --overwrite-dest --filename extension.zip
+        # Package runtime assets only (manifest + src/ + assets/icons/), mirroring the
+        # Chrome `build:chrome` allowlist. Without --ignore-files, web-ext bundles
+        # package.json, tests/, scripts/, docs/, README*, etc. into the AMO .xpi.
+        # web-ext already excludes dotfiles, .github/, node_modules/, *.zip/*.xpi and
+        # the artifacts dir by default; we only deny the remaining dev files/dirs.
+        run: >
+          npx web-ext build --source-dir . --artifacts-dir dist --overwrite-dest --filename extension.zip
+          --ignore-files package.json package-lock.json eslint.config.js "*.md" LICENSE tests "tests/**" scripts "scripts/**" docs "docs/**" coverage "coverage/**"
 
       - name: Attest build provenance
         # SLSA build provenance for the unsigned zip — verifies the bytes
@@ -89,7 +96,9 @@ jobs:
           CHANNEL: ${{ inputs.channel }}
           AMO_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
-        run: npx web-ext sign --source-dir . --channel "$CHANNEL" --api-key "$AMO_API_KEY" --api-secret "$AMO_API_SECRET"
+        run: >
+          npx web-ext sign --source-dir . --channel "$CHANNEL" --api-key "$AMO_API_KEY" --api-secret "$AMO_API_SECRET"
+          --ignore-files package.json package-lock.json eslint.config.js "*.md" LICENSE tests "tests/**" scripts "scripts/**" docs "docs/**" coverage "coverage/**"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
