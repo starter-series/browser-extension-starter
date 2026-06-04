@@ -31,6 +31,14 @@
     return typeof value === 'string' && HEX_COLOR_RE.test(value);
   }
 
+  // Positive boolean check. Accepts ONLY a real boolean; every other value
+  // (including the strings 'false'/'no', 0, null, '') falls back to `fallback`.
+  // This is deliberately NOT `value !== false`: that bare form would coerce
+  // truthy garbage into `true` and ignore the configured default entirely.
+  function coerceBool(value, fallback) {
+    return typeof value === 'boolean' ? value : fallback;
+  }
+
   function parseBlockedDomains(raw) {
     if (typeof raw !== 'string') return [];
     return raw
@@ -41,7 +49,9 @@
 
   function coerce(stored) {
     const merged = { ...DEFAULTS, ...(stored || {}) };
-    merged.highlightEnabled = merged.highlightEnabled !== false;
+    // Mirror the sibling fields: validate shape before accepting, falling
+    // back to the configured default for anything that isn't a real boolean.
+    merged.highlightEnabled = coerceBool(merged.highlightEnabled, DEFAULTS.highlightEnabled);
     merged.highlightColor = isValidColor(merged.highlightColor)
       ? merged.highlightColor
       : DEFAULTS.highlightColor;
@@ -93,6 +103,7 @@
     HEX_COLOR_RE,
     DOMAIN_RE,
     isValidColor,
+    coerceBool,
     parseBlockedDomains,
     coerce,
     getSettings,
