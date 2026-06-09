@@ -2,7 +2,7 @@
  * Store-asset config — the interface every consumer of this starter implements.
  *
  * `npm run capture:store` reads this file and produces CWS assets into outDir.
- * The generic harness (scripts/store-assets/) owns build → launch → screenshot
+ * The shotkit engine (`@starter-series/shotkit`) owns build → launch → screenshot
  * → caption → promo → video → description; THIS file owns the project-specific
  * parts: which extension to load, how to set up the page environment, and the
  * "scenes" that drive the extension into each money-shot state.
@@ -22,8 +22,7 @@
  */
 
 const path = require('path');
-const { stageExtension, patchManifestForLocalhost } = require('./scripts/store-assets/lib/extension');
-const { serveDirectory } = require('./scripts/store-assets/lib/serve');
+const { stageExtension, patchManifestForLocalhost, serveDirectory } = require('@starter-series/shotkit');
 
 const FIXTURES = path.join(__dirname, 'store-assets', 'fixtures');
 const TEMPLATES = path.join(__dirname, 'store-assets', 'templates');

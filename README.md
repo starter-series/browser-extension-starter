@@ -79,8 +79,7 @@ npm run build:chrome
 │   ├── background/                # Service worker
 │   └── content/                   # Content script (JS + CSS)
 ├── assets/icons/                  # Extension icons (16/32/48/128)
-├── store.config.js                # Store-asset scenes (what to screenshot)
-├── scripts/store-assets/          # Generic capture harness (npm run capture:store)
+├── shotkit.config.js              # Store-asset scenes (consumed by @starter-series/shotkit)
 ├── store-assets/                  # Listing copy + fixtures/templates (outputs gitignored)
 ├── .github/
 │   ├── workflows/
@@ -224,11 +223,11 @@ npm run capture:store      # produce assets into store-assets/
 Outputs land in `store-assets/`: one PNG per scene (1280×800), a promo tile
 (440×280), `demo.webm`, and `description.md` (listing copy extracted from
 `STORE_LISTING.md`). Flags: `--scene <name>` (capture just one), `--no-video`,
-`--live-gt`, `--freeze` (see `store.config.js`).
+`--live-gt`, `--freeze` (see `shotkit.config.js`).
 
-**How it works.** `store.config.js` is the seam. The generic harness in
-`scripts/store-assets/` owns build → launch → screenshot → caption → promo →
-video → description; your `store.config.js` owns the project-specific parts: which
+**How it works.** `shotkit.config.js` is the seam. The shotkit engine
+(`@starter-series/shotkit`) owns build → launch → screenshot → caption → promo →
+video → description; your `shotkit.config.js` owns the project-specific parts: which
 extension dir to load, an optional `setup()` (e.g. a fixture HTTP server), and the
 `scenes` that drive the extension into each money-shot state. A scene is just:
 
@@ -251,8 +250,8 @@ for a five-scene example with a fixture server and content-script driving.)
   a real-bundle smoke test**: a screenshot appearing proves that feature works in
   the shipped bundle. Captures are deterministic (login-free fixtures, frozen
   translations/data) so they're reproducible in CI.
-- **Trademark-safety** — the harness composites a configurable disclaimer band
-  onto every screenshot and the promo tile (`disclaimer` in `store.config.js`), so
+- **Trademark-safety** — shotkit composites a configurable disclaimer band
+  onto every screenshot and the promo tile (`disclaimer` in `shotkit.config.js`), so
   a "not affiliated" line can't be forgotten when an extension interoperates with a
   third-party brand.
 - **Non-goals** — this is a *clean automatic screencast and a tidy promo graphic*,
@@ -284,7 +283,7 @@ for a five-scene example with a fixture server and content-script driving.)
 | Build system | None (raw files) | Vite / Parcel (required) |
 | Learning curve | Read the browser APIs directly | Learn the framework's abstractions |
 | CI/CD | Full pipeline included | Not included |
-| Dependencies | 7 dev, 0 runtime | 100+ |
+| Dependencies | 9 dev, 0 runtime | 100+ |
 | AI/vibe-coding | LLMs generate clean vanilla JS | LLMs must understand framework conventions |
 | Best for | Utility extensions, scripts, simple tools | Complex apps with multi-page UIs |
 

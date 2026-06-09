@@ -79,8 +79,7 @@ npm run build:chrome
 │   ├── background/                # 서비스 워커
 │   └── content/                   # 콘텐츠 스크립트 (JS + CSS)
 ├── assets/icons/                  # 확장 아이콘 (16/32/48/128)
-├── store.config.js                # 스토어 자산 scene (무엇을 스크린샷할지)
-├── scripts/store-assets/          # 제너릭 캡처 하니스 (npm run capture:store)
+├── shotkit.config.js              # 스토어 자산 scene (@starter-series/shotkit가 소비)
 ├── store-assets/                  # 리스팅 문구 + fixtures/templates (출력물은 gitignore)
 ├── .github/
 │   ├── workflows/
@@ -219,9 +218,9 @@ npm run capture:install   # 최초 1회: Playwright Chromium 다운로드
 npm run capture:store      # store-assets/ 에 자산 생성
 ```
 
-출력물은 `store-assets/`에 생성됩니다: scene별 PNG(1280×800), 프로모 타일(440×280), `demo.webm`, 그리고 `STORE_LISTING.md`에서 추출한 `description.md`(복붙용 리스팅 문구). 플래그: `--scene <name>`(하나만 캡처), `--no-video`, `--live-gt`, `--freeze` (자세한 내용은 `store.config.js` 참고).
+출력물은 `store-assets/`에 생성됩니다: scene별 PNG(1280×800), 프로모 타일(440×280), `demo.webm`, 그리고 `STORE_LISTING.md`에서 추출한 `description.md`(복붙용 리스팅 문구). 플래그: `--scene <name>`(하나만 캡처), `--no-video`, `--live-gt`, `--freeze` (자세한 내용은 `shotkit.config.js` 참고).
 
-**동작 방식.** `store.config.js`가 이음새입니다. `scripts/store-assets/`의 제너릭 하니스가 빌드 → 실행 → 스크린샷 → 캡션 → 프로모 → 영상 → 설명을 담당하고, 프로젝트의 `store.config.js`는 프로젝트별 부분만 정의합니다: 어떤 확장 디렉터리를 로드할지, 선택적 `setup()`(예: 픽스처 HTTP 서버), 그리고 확장을 각 "money shot" 상태로 몰아넣는 `scenes`. scene은 다음과 같이 단순합니다:
+**동작 방식.** `shotkit.config.js`가 이음새입니다. `@starter-series/shotkit` 엔진이 빌드 → 실행 → 스크린샷 → 캡션 → 프로모 → 영상 → 설명을 담당하고, 프로젝트의 `shotkit.config.js`는 프로젝트별 부분만 정의합니다: 어떤 확장 디렉터리를 로드할지, 선택적 `setup()`(예: 픽스처 HTTP 서버), 그리고 확장을 각 "money shot" 상태로 몰아넣는 `scenes`. scene은 다음과 같이 단순합니다:
 
 ```js
 { name: '01-feature', caption: '무엇을 보여주는지',
@@ -234,7 +233,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
 기본 제공되는 scene은 이 스타터 자체의 하이라이터를 대상으로 한 동작 데모입니다 — 본인 것으로 교체하십시오. (픽스처 서버 + 콘텐츠 스크립트 구동이 포함된 다섯 장짜리 예시는 [skillBridge](https://github.com/heznpc/skillbridge) 소비 프로젝트를 참고하십시오.)
 
 - **설계 의도 (Design intent)** — Playwright가 `launchPersistentContext(--load-extension)`로 *빌드된* 확장을 로드하고, 콘텐츠가 렌더된 뒤 고정 뷰포트를 캡처합니다. 이는 데스크톱 스크린샷 도구가 겪는 로딩-vs-캡처 경합(화면 일부가 fetch 안 된 채 찍히는 문제)을 구조적으로 없앱니다. 또한 이 실행은 **실제 빌드본 smoke test를 겸합니다**: 스크린샷이 나온다는 것은 그 기능이 출하 번들에서 실제로 동작했다는 뜻입니다. 캡처는 결정적(로그인 불필요 픽스처, freeze된 번역/데이터)이므로 CI에서도 재현됩니다.
-- **상표 안전성** — 하니스는 모든 스크린샷과 프로모 타일에 설정 가능한 면책 문구 밴드를 합성합니다(`store.config.js`의 `disclaimer`). 제3자 브랜드와 상호작용하는 확장에서 "비제휴(not affiliated)" 문구를 빠뜨릴 수 없게 만듭니다.
+- **상표 안전성** — 하니스는 모든 스크린샷과 프로모 타일에 설정 가능한 면책 문구 밴드를 합성합니다(`shotkit.config.js`의 `disclaimer`). 제3자 브랜드와 상호작용하는 확장에서 "비제휴(not affiliated)" 문구를 빠뜨릴 수 없게 만듭니다.
 - **하지 않는 것 (Non-goals)** — 이것은 *깔끔한 자동 스크린캐스트와 단정한 프로모 그래픽*이지, 보이스오버 광고나 에이전시급 아트워크가 아닙니다. 실제 UI를 캡처할 뿐, 과장하지 않습니다.
 
 > MV3 확장 로드는 headed Chromium을 필요로 하므로, 캡처는 로컬에서는 headed로, CI에서는 `xvfb-run` 아래에서 실행됩니다.
@@ -261,7 +260,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
 | 빌드 시스템 | 없음 (원본 파일 그대로) | Vite / Parcel (필수) |
 | 학습 곡선 | 브라우저 API를 직접 사용 | 프레임워크 추상화 학습 필요 |
 | CI/CD | 풀 파이프라인 포함 | 미포함 |
-| 의존성 | dev 7개, runtime 0개 | 100개+ |
+| 의존성 | dev 9개, runtime 0개 | 100개+ |
 | AI/바이브코딩 | LLM이 깔끔한 vanilla JS 생성 | LLM이 프레임워크 규칙을 이해해야 함 |
 | 적합한 용도 | 유틸리티 확장, 스크립트, 간단한 도구 | 멀티 페이지 UI의 복잡한 앱 |
 

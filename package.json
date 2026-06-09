@@ -13,16 +13,16 @@
     "test": "jest --verbose --coverage",
     "lint": "eslint src/",
     "lint:css": "stylelint \"src/**/*.css\"",
-    "capture:store": "node scripts/store-assets/capture.js",
-    "capture:install": "playwright install chromium"
+    "capture:store": "shotkit",
+    "capture:install": "npx playwright install chromium"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@starter-series/shotkit": "github:starter-series/shotkit#v1.0.0",
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "30.4.1",
-    "playwright": "^1.60.0",
     "stylelint": "^17.12.0",
     "stylelint-config-standard": "^40.0.0",
     "web-ext": "^10.3.0"

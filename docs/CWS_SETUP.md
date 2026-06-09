@@ -37,7 +37,7 @@ npm run capture:store      # → store-assets/*.png (1280×800), promo tile (440
                            #   demo.webm, and description.md (copy/paste listing copy)
 ```
 
-- Edit which states get captured in **`store.config.js`** (the `scenes`), and the
+- Edit which states get captured in **`shotkit.config.js`** (the `scenes`), and the
   listing copy in **`store-assets/STORE_LISTING.md`**.
 - Because it loads the shipped bundle, a clean run also **smoke-tests the build** —
   a screenshot only appears if that feature actually rendered.
