@@ -26,6 +26,26 @@ Step-by-step guide to set up Chrome Web Store publishing for the CD pipeline.
 4. Click **Save Draft** (do not publish yet)
 5. Note your **Extension ID** from the URL — it looks like `abcdefghijklmnopabcdefghijklmnop`
 
+### Generate the screenshots, promo tile, and description
+
+Don't hand-make these. The template ships a Playwright generator that drives the
+*built* extension and captures store assets at the exact CWS dimensions:
+
+```bash
+npm run capture:install   # one-time: download the Playwright Chromium
+npm run capture:store      # → store-assets/*.png (1280×800), promo tile (440×280),
+                           #   demo.webm, and description.md (copy/paste listing copy)
+```
+
+- Edit which states get captured in **`store.config.js`** (the `scenes`), and the
+  listing copy in **`store-assets/STORE_LISTING.md`**.
+- Because it loads the shipped bundle, a clean run also **smoke-tests the build** —
+  a screenshot only appears if that feature actually rendered.
+- Upload the generated PNGs as screenshots and the 440×280 PNG as the small promo
+  tile; paste `description.md` into the Summary / Description / "What's new" fields.
+- CWS does not host video directly — upload `demo.webm` to YouTube and paste the
+  link in the listing's video field.
+
 ## 3. Create Google OAuth2 Credentials
 
 The CD pipeline uses the Chrome Web Store API, which requires OAuth2 credentials.

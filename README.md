@@ -25,7 +25,7 @@ Build your extension. Push to deploy.
 
 ## Status & Scope
 
-- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with a Jest unit-test gate on `src/settings.js` (other src/ files exercised only via structural smoke tests in `tests/sources.test.js`), Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template.
+- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with a Jest unit-test gate on `src/settings.js` (other src/ files exercised only via structural smoke tests in `tests/sources.test.js`), Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, and a one-command **store-asset generator** (`npm run capture:store`) that drives the built extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
 - **Planned** — none on a public roadmap. This is a starter, not a product; features land when a downstream extension needs them.
 - **Design intent** — Zero build step, vanilla JS, raw browser APIs. The point is to ship a working extension on day one and let an LLM read the code without first learning a framework. Coverage gates are baseline-aware (anchored to the current baseline, not aspirational) — they catch regressions, not author shame.
 - **Non-goals** — Bundling (Vite/Parcel/webpack), TypeScript by default, UI frameworks (React/Vue/Svelte), single-page-app routing, opinionated state libraries. Those are real needs — they belong in [WXT](https://github.com/wxt-dev/wxt) or [Plasmo](https://github.com/PlasmoHQ/plasmo). See the comparison table below.
@@ -79,6 +79,9 @@ npm run build:chrome
 │   ├── background/                # Service worker
 │   └── content/                   # Content script (JS + CSS)
 ├── assets/icons/                  # Extension icons (16/32/48/128)
+├── store.config.js                # Store-asset scenes (what to screenshot)
+├── scripts/store-assets/          # Generic capture harness (npm run capture:store)
+├── store-assets/                  # Listing copy + fixtures/templates (outputs gitignored)
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml                 # Validate, audit, lint, test, build
@@ -104,6 +107,7 @@ npm run build:chrome
 - **Starter code** — Popup with toggle + options page + background + content script
 - **Settings storage example** — `chrome.storage.sync` end-to-end: options form → content script → live updates
 - **Store-ready** — OAuth setup guide + privacy policy template
+- **Store-asset generator** — `npm run capture:store` captures CWS screenshots, a promo tile, and a demo screencast from the *built* extension via Playwright (no manual screenshotting)
 - **Template setup** — Auto-creates setup checklist issue on first use
 
 ## CI/CD
@@ -205,6 +209,58 @@ The template ships with a small **`chrome.storage.sync`** example that wires an 
 **Why sync and not local?** [`chrome.storage.sync`](https://developer.chrome.com/docs/extensions/reference/api/storage) roams the user's preferences with their Google/Firefox profile. Use `local` for caches or device-specific state, `session` for values that die with the browser session.
 
 **Firefox compatibility.** Modern Firefox (109+, which this template targets via `browser_specific_settings.gecko.strict_min_version`) exposes `chrome.storage.sync` directly — no [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill) needed. Add the polyfill only if you need promise-returning APIs without callbacks, or if you must support Firefox < 109.
+
+## Store assets
+
+Producing Chrome Web Store assets by hand — five screenshots, a promo tile, a demo
+clip, the listing copy — is the chore that quietly delays releases. This template
+generates them from one command:
+
+```bash
+npm run capture:install   # one-time: download the Playwright Chromium
+npm run capture:store      # produce assets into store-assets/
+```
+
+Outputs land in `store-assets/`: one PNG per scene (1280×800), a promo tile
+(440×280), `demo.webm`, and `description.md` (listing copy extracted from
+`STORE_LISTING.md`). Flags: `--scene <name>` (capture just one), `--no-video`,
+`--live-gt`, `--freeze` (see `store.config.js`).
+
+**How it works.** `store.config.js` is the seam. The generic harness in
+`scripts/store-assets/` owns build → launch → screenshot → caption → promo →
+video → description; your `store.config.js` owns the project-specific parts: which
+extension dir to load, an optional `setup()` (e.g. a fixture HTTP server), and the
+`scenes` that drive the extension into each money-shot state. A scene is just:
+
+```js
+{ name: '01-feature', caption: 'What this shows',
+  async run({ page, context, extensionId, env }) {
+    await page.goto(`${env.baseUrl}/some-page`);
+    // …drive the UI, wait until it has rendered…
+  } }
+```
+
+The shipped scenes are a working demo against this starter's own highlighter; swap
+in your own. (See the [skillBridge](https://github.com/heznpc/skillbridge) consumer
+for a five-scene example with a fixture server and content-script driving.)
+
+- **Design intent** — Playwright loads the *built* extension via
+  `launchPersistentContext(--load-extension)` and waits for content to render
+  before capturing a fixed viewport. That removes the load-vs-capture race that
+  desktop screenshotters hit (half-fetched UI). It also means the run **doubles as
+  a real-bundle smoke test**: a screenshot appearing proves that feature works in
+  the shipped bundle. Captures are deterministic (login-free fixtures, frozen
+  translations/data) so they're reproducible in CI.
+- **Trademark-safety** — the harness composites a configurable disclaimer band
+  onto every screenshot and the promo tile (`disclaimer` in `store.config.js`), so
+  a "not affiliated" line can't be forgotten when an extension interoperates with a
+  third-party brand.
+- **Non-goals** — this is a *clean automatic screencast and a tidy promo graphic*,
+  not a voiceover ad or agency-grade artwork. It captures real UI; it does not
+  embellish it.
+
+> Loading an MV3 extension requires a headed Chromium, so capture runs headed
+> locally and under `xvfb-run` in CI.
 
 ## Customization
 
