@@ -25,7 +25,7 @@
 
 ## 상태와 범위 (Status & Scope)
 
-- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제 + `src/settings.js`에 대한 Jest 단위 테스트 게이트(나머지 src/ 파일은 `tests/sources.test.js`의 structural smoke test로만 확인됩니다), `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿.
+- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제 + `src/settings.js`에 대한 Jest 단위 테스트 게이트(나머지 src/ 파일은 `tests/sources.test.js`의 structural smoke test로만 확인됩니다), `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, 그리고 빌드된 확장을 Playwright로 구동해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
 - **계획된 것 (Planned)** — 공개 로드맵 없음. 이 저장소는 프로덕트가 아니라 스타터입니다. 하위 확장 프로그램에서 필요해질 때 기능을 추가합니다.
 - **설계 의도 (Design intent)** — 빌드 단계 없음, 바닐라 JS, 브라우저 API 직접 사용. 목표는 첫날부터 동작하는 확장을 출하하는 것, 그리고 LLM이 프레임워크를 먼저 배우지 않고도 코드를 읽을 수 있게 하는 것입니다. 커버리지 게이트는 현재 베이스라인을 기준으로 잡은 baseline-aware 방식이며, 회귀를 잡기 위한 장치이지 저자에게 부담을 주려는 목적은 아닙니다.
 - **하지 않기로 한 것 (Non-goals)** — 번들러(Vite/Parcel/webpack), 기본 TypeScript, UI 프레임워크(React/Vue/Svelte), SPA 라우팅, 상태 관리 라이브러리. 이런 요구가 실재한다는 점은 인정합니다 — 그 경우 [WXT](https://github.com/wxt-dev/wxt)나 [Plasmo](https://github.com/PlasmoHQ/plasmo)를 사용하시기 바랍니다. 아래 비교표를 참고하십시오.
@@ -79,6 +79,9 @@ npm run build:chrome
 │   ├── background/                # 서비스 워커
 │   └── content/                   # 콘텐츠 스크립트 (JS + CSS)
 ├── assets/icons/                  # 확장 아이콘 (16/32/48/128)
+├── store.config.js                # 스토어 자산 scene (무엇을 스크린샷할지)
+├── scripts/store-assets/          # 제너릭 캡처 하니스 (npm run capture:store)
+├── store-assets/                  # 리스팅 문구 + fixtures/templates (출력물은 gitignore)
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml                 # 검증, 감사, 린트, 테스트, 빌드
@@ -104,6 +107,7 @@ npm run build:chrome
 - **스타터 코드** — 토글 팝업 + 옵션 페이지 + 백그라운드 + 콘텐츠 스크립트
 - **설정 저장 예제** — `chrome.storage.sync`로 옵션 페이지 → 콘텐츠 스크립트 → 실시간 업데이트까지 완전 연결
 - **스토어 제출 지원** — OAuth 설정 가이드 + 개인정보처리방침 템플릿
+- **스토어 자산 생성기** — `npm run capture:store`가 *빌드된* 확장을 Playwright로 구동해 CWS 스크린샷·프로모 타일·데모 스크린캐스트를 캡처합니다 (수동 스크린샷 불필요)
 - **템플릿 셋업** — 첫 사용 시 설정 체크리스트 이슈 자동 생성
 
 ## CI/CD
@@ -205,6 +209,35 @@ npm test
 **왜 sync? local은?** [`chrome.storage.sync`](https://developer.chrome.com/docs/extensions/reference/api/storage)는 사용자의 Google/Firefox 프로필을 따라 설정이 동기화됩니다. `local`은 캐시나 기기별 상태에, `session`은 브라우저 세션이 끝나면 사라져도 되는 값에 쓰세요.
 
 **Firefox 호환성.** 이 템플릿이 타겟하는 Firefox 109+ (`browser_specific_settings.gecko.strict_min_version` 기준)는 `chrome.storage.sync`를 네이티브로 지원하므로 [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill)은 **불필요**합니다. Promise 반환 API가 필요하거나 Firefox < 109를 지원해야 한다면 그때 추가하세요.
+
+## 스토어 자산
+
+Chrome Web Store 자산 — 스크린샷 다섯 장, 프로모 타일, 데모 영상, 리스팅 문구 — 을 매번 손으로 만드는 일은 릴리스를 조용히 늦추는 잡일입니다. 이 템플릿은 단일 커맨드로 생성합니다:
+
+```bash
+npm run capture:install   # 최초 1회: Playwright Chromium 다운로드
+npm run capture:store      # store-assets/ 에 자산 생성
+```
+
+출력물은 `store-assets/`에 생성됩니다: scene별 PNG(1280×800), 프로모 타일(440×280), `demo.webm`, 그리고 `STORE_LISTING.md`에서 추출한 `description.md`(복붙용 리스팅 문구). 플래그: `--scene <name>`(하나만 캡처), `--no-video`, `--live-gt`, `--freeze` (자세한 내용은 `store.config.js` 참고).
+
+**동작 방식.** `store.config.js`가 이음새입니다. `scripts/store-assets/`의 제너릭 하니스가 빌드 → 실행 → 스크린샷 → 캡션 → 프로모 → 영상 → 설명을 담당하고, 프로젝트의 `store.config.js`는 프로젝트별 부분만 정의합니다: 어떤 확장 디렉터리를 로드할지, 선택적 `setup()`(예: 픽스처 HTTP 서버), 그리고 확장을 각 "money shot" 상태로 몰아넣는 `scenes`. scene은 다음과 같이 단순합니다:
+
+```js
+{ name: '01-feature', caption: '무엇을 보여주는지',
+  async run({ page, context, extensionId, env }) {
+    await page.goto(`${env.baseUrl}/some-page`);
+    // …UI를 구동하고, 렌더가 끝날 때까지 대기…
+  } }
+```
+
+기본 제공되는 scene은 이 스타터 자체의 하이라이터를 대상으로 한 동작 데모입니다 — 본인 것으로 교체하십시오. (픽스처 서버 + 콘텐츠 스크립트 구동이 포함된 다섯 장짜리 예시는 [skillBridge](https://github.com/heznpc/skillbridge) 소비 프로젝트를 참고하십시오.)
+
+- **설계 의도 (Design intent)** — Playwright가 `launchPersistentContext(--load-extension)`로 *빌드된* 확장을 로드하고, 콘텐츠가 렌더된 뒤 고정 뷰포트를 캡처합니다. 이는 데스크톱 스크린샷 도구가 겪는 로딩-vs-캡처 경합(화면 일부가 fetch 안 된 채 찍히는 문제)을 구조적으로 없앱니다. 또한 이 실행은 **실제 빌드본 smoke test를 겸합니다**: 스크린샷이 나온다는 것은 그 기능이 출하 번들에서 실제로 동작했다는 뜻입니다. 캡처는 결정적(로그인 불필요 픽스처, freeze된 번역/데이터)이므로 CI에서도 재현됩니다.
+- **상표 안전성** — 하니스는 모든 스크린샷과 프로모 타일에 설정 가능한 면책 문구 밴드를 합성합니다(`store.config.js`의 `disclaimer`). 제3자 브랜드와 상호작용하는 확장에서 "비제휴(not affiliated)" 문구를 빠뜨릴 수 없게 만듭니다.
+- **하지 않는 것 (Non-goals)** — 이것은 *깔끔한 자동 스크린캐스트와 단정한 프로모 그래픽*이지, 보이스오버 광고나 에이전시급 아트워크가 아닙니다. 실제 UI를 캡처할 뿐, 과장하지 않습니다.
+
+> MV3 확장 로드는 headed Chromium을 필요로 하므로, 캡처는 로컬에서는 headed로, CI에서는 `xvfb-run` 아래에서 실행됩니다.
 
 ## 커스터마이징
 
