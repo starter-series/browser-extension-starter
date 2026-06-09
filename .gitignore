@@ -6,3 +6,9 @@ coverage/
 .env
 .idea/
 .claude/
+
+# Generated store assets — fixtures/, templates/, STORE_LISTING.md stay tracked
+store-assets/*.png
+store-assets/*.webm
+store-assets/description.md
+test-results/
