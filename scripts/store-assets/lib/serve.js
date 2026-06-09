@@ -45,12 +45,16 @@ const FIXTURE_CSP =
  * @returns {Promise<{baseUrl: string, close: () => Promise<void>}>}
  */
 function serveDirectory(dir, opts = {}) {
+  const root = path.resolve(dir);
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
       const urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
-      let filePath = path.join(dir, urlPath === '/' ? 'index.html' : urlPath);
+      // Path-traversal sanitizer (CodeQL js/path-injection): normalize, then
+      // strip any leading `../` segments so the join can't escape `root`.
+      const rel = path.normalize(urlPath === '/' ? '/index.html' : urlPath).replace(/^(\.\.(\/|\\|$))+/, '');
+      let filePath = path.join(root, rel);
       if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-        filePath = opts.fallback ? path.join(dir, opts.fallback) : null;
+        filePath = opts.fallback ? path.join(root, opts.fallback) : null;
       }
       if (!filePath || !fs.existsSync(filePath)) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
