@@ -1,0 +1,90 @@
+name: Capture store assets
+
+# Regenerates the CWS/social assets from the BUILT extension entirely in CI —
+# no local browser or Node needed: Actions tab → "Capture store assets" →
+# Run workflow → download the `store-assets` artifact. Because shotkit loads
+# the shipped bundle, a green run doubles as a real-bundle smoke test (a
+# screenshot only appears if that feature actually rendered).
+
+on:
+  workflow_dispatch:
+    inputs:
+      scene:
+        description: 'Only this scene/tile/demo (comma-separated; empty = all)'
+        required: false
+        default: ''
+      video:
+        description: 'Record the demo screencast (webm)'
+        type: boolean
+        default: true
+      headless:
+        description: 'Run headless instead of under xvfb (experimental)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Cache the Chromium binary so re-runs skip the ~120MB download.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install xvfb (always) + Playwright Chromium (conditional)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
+            npx playwright install --with-deps chromium
+          else
+            npx playwright install-deps chromium
+          fi
+
+      # Inputs flow via env (never interpolated into the script) — see
+      # GitHub's workflow-injection guidance.
+      - name: Capture
+        env:
+          SCENE: ${{ inputs.scene }}
+          VIDEO: ${{ inputs.video }}
+          HEADLESS: ${{ inputs.headless }}
+        run: |
+          ARGS=()
+          if [ -n "$SCENE" ]; then ARGS+=(--scene "$SCENE"); fi
+          if [ "$VIDEO" != "true" ]; then ARGS+=(--no-video); fi
+          if [ "$HEADLESS" = "true" ]; then
+            HEADED=0 npx shotkit --json "${ARGS[@]}" | tee shotkit-result.json
+          else
+            xvfb-run -a npx shotkit --json "${ARGS[@]}" | tee shotkit-result.json
+          fi
+          { echo "### shotkit assets"
+            node -e "const r=require('./shotkit-result.json'); console.log(r.produced.map(p=>'- \`'+p.split('/').pop()+'\`').join('\n'))"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload assets
+        uses: actions/upload-artifact@v7
+        with:
+          name: store-assets
+          path: |
+            store-assets/*.png
+            store-assets/*.webm
+            store-assets/description.md
+          if-no-files-found: error
