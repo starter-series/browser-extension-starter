@@ -258,8 +258,11 @@ for a five-scene example with a fixture server and content-script driving.)
   not a voiceover ad or agency-grade artwork. It captures real UI; it does not
   embellish it.
 
-> Loading an MV3 extension requires a headed Chromium, so capture runs headed
-> locally and under `xvfb-run` in CI.
+> Capture runs a real Chromium — headed by default locally (`HEADED=0` runs
+> headless; verified). It can also run **entirely in CI**: Actions →
+> **"Capture store assets"** → Run workflow regenerates everything and uploads
+> a `store-assets` artifact — no local browser or Node needed, and a green run
+> doubles as a real-bundle smoke test.
 
 ## Customization
 

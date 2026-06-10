@@ -236,7 +236,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
 - **상표 안전성** — 하니스는 모든 스크린샷과 프로모 타일에 설정 가능한 면책 문구 밴드를 합성합니다(`shotkit.config.js`의 `disclaimer`). 제3자 브랜드와 상호작용하는 확장에서 "비제휴(not affiliated)" 문구를 빠뜨릴 수 없게 만듭니다.
 - **하지 않는 것 (Non-goals)** — 이것은 *깔끔한 자동 스크린캐스트와 단정한 프로모 그래픽*이지, 보이스오버 광고나 에이전시급 아트워크가 아닙니다. 실제 UI를 캡처할 뿐, 과장하지 않습니다.
 
-> MV3 확장 로드는 headed Chromium을 필요로 하므로, 캡처는 로컬에서는 headed로, CI에서는 `xvfb-run` 아래에서 실행됩니다.
+> 캡처는 실제 Chromium을 구동합니다 — 로컬 기본은 headed(`HEADED=0`로 headless 실행, 검증됨)이며, **CI에서 전부 실행**할 수도 있습니다: Actions → **"Capture store assets"** → Run workflow가 전체 자산을 재생성해 `store-assets` artifact로 업로드합니다(로컬 브라우저·Node 불필요, green run = 실제 빌드본 smoke test).
 
 ## 커스터마이징
 
