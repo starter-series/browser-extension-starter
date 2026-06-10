@@ -18,9 +18,9 @@ on:
         type: boolean
         default: true
       headless:
-        description: 'Run headless instead of under xvfb (experimental)'
+        description: 'Run headless (verified on Linux CI incl. video); false = headed under xvfb'
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
@@ -70,13 +70,19 @@ jobs:
           ARGS=()
           if [ -n "$SCENE" ]; then ARGS+=(--scene "$SCENE"); fi
           if [ "$VIDEO" != "true" ]; then ARGS+=(--no-video); fi
+          # No pipe around shotkit — the default GH shell lacks pipefail, and a
+          # pipe would mask its exit code. Progress logs stream live on stderr.
           if [ "$HEADLESS" = "true" ]; then
-            HEADED=0 npx shotkit --json "${ARGS[@]}" | tee shotkit-result.json
+            HEADED=0 npx shotkit --json "${ARGS[@]}" > shotkit-result.json
           else
-            xvfb-run -a npx shotkit --json "${ARGS[@]}" | tee shotkit-result.json
+            # 24-bit depth is required — xvfb-run's default 8-bit screen makes
+            # Chromium's Page.captureScreenshot fail ("Unable to capture screenshot").
+            xvfb-run -a --server-args="-screen 0 1920x1080x24" \
+              npx shotkit --json "${ARGS[@]}" > shotkit-result.json
           fi
+          cat shotkit-result.json
           { echo "### shotkit assets"
-            node -e "const r=require('./shotkit-result.json'); console.log(r.produced.map(p=>'- \`'+p.split('/').pop()+'\`').join('\n'))"
+            node -e "const r=require('./shotkit-result.json'); console.log((r.produced||[]).map(p=>'- \`'+p.split('/').pop()+'\`').join('\n'))"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload assets
