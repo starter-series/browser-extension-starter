@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@starter-series/shotkit": "github:starter-series/shotkit#v1.0.0",
+    "@starter-series/shotkit": "^1.1.1",
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
     "jest": "^30.3.0",
