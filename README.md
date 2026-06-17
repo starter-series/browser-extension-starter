@@ -274,7 +274,7 @@ for a five-scene example with a fixture server and content-script driving.)
 6. Add page injection in `src/content/`
 7. Copy `docs/PRIVACY_POLICY_TEMPLATE.md` and fill in your details
 
-> **Note:** The default content script matches `https://*/*` and `http://*/*`. If your extension only needs specific sites, narrow the `matches` in `manifest.json` to minimize permissions — Chrome Web Store review is stricter with broad host permissions.
+> **Note:** The default content script is scoped to `https://example.com/*` as a safe placeholder. Replace it with the sites your extension truly needs. Broad host access is kept in `optional_host_permissions` for user-granted expansion; Chrome Web Store review is stricter when `content_scripts.matches` starts broad.
 
 ## Why This Over WXT / Plasmo?
 
