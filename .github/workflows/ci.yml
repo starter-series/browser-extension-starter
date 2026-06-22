@@ -92,3 +92,9 @@ jobs:
             echo "::error::Extension zip exceeds 10 MB ($((SIZE / 1024 / 1024)) MB)"
             exit 1
           fi
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser extension smoke
+        run: npm run smoke:extension

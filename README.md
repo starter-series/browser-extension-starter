@@ -25,7 +25,7 @@ Build your extension. Push to deploy.
 
 ## Status & Scope
 
-- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with a Jest unit-test gate on `src/settings.js` (other src/ files exercised only via structural smoke tests in `tests/sources.test.js`), Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, package metadata that dry-runs cleanly with `npm pack --dry-run --json`, and a one-command **store-asset generator** (`npm run capture:store`) that drives the built extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
+- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build · real extension smoke), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with Jest behavioral coverage for settings, popup, options, content, and background flows, Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, package metadata that dry-runs cleanly with `npm pack --dry-run --json`, and a one-command **store-asset generator** (`npm run capture:store`) that drives the built extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
 - **Planned** — none on a public roadmap. This is a starter, not a product; features land when a downstream extension needs them.
 - **Design intent** — Zero build step, vanilla JS, raw browser APIs. The point is to ship a working extension on day one and let an LLM read the code without first learning a framework. Coverage gates are baseline-aware (anchored to the current baseline, not aspirational) — they catch regressions, not author shame.
 - **Non-goals** — Bundling (Vite/Parcel/webpack), TypeScript by default, UI frameworks (React/Vue/Svelte), single-page-app routing, opinionated state libraries. Those are real needs — they belong in [WXT](https://github.com/wxt-dev/wxt) or [Plasmo](https://github.com/PlasmoHQ/plasmo). See the comparison table below.
@@ -56,6 +56,7 @@ npm test
 npm run lint
 npm run lint:css
 npm run build:chrome
+npm run smoke:extension
 npm audit --audit-level=high
 npm pack --dry-run --json
 ```
@@ -130,8 +131,9 @@ npm run build:chrome
 | Audit permissions | Warns on risky permissions and broad host access |
 | Security audit | `npm audit` for dependency vulnerabilities |
 | Lint | ESLint (JS) + Stylelint (CSS) |
-| Test | Jest (passes with no tests by default) |
-| Build verification | Builds zip and checks size stays under 10 MB |
+| Test | Jest behavioral tests for settings, popup, options, content, and background flows |
+| Build verification | Builds zip and verifies required entries plus size |
+| Extension smoke | Loads the unpacked extension in Chromium and checks popup ↔ storage ↔ content-script behavior |
 
 ### Security & Maintenance
 
@@ -193,6 +195,9 @@ npm run version:major   # 1.0.0 → 2.0.0
 
 # Build store zip
 npm run build:chrome
+
+# Load the unpacked extension in Chromium and smoke popup/options/content paths
+npm run smoke:extension
 
 # Lint & test
 npm run lint        # JS

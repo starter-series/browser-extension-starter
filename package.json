@@ -28,6 +28,7 @@
   "scripts": {
     "dev": "web-ext run -t chromium --source-dir . --start-url chrome://extensions",
     "build:chrome": "rm -f dist/extension.zip && mkdir -p dist && zip -r dist/extension.zip manifest.json src/ assets/icons/ -x '*.DS_Store' && node scripts/check-extension-zip.js",
+    "smoke:extension": "node scripts/smoke-extension.mjs",
     "version:patch": "node scripts/bump-version.js patch",
     "version:minor": "node scripts/bump-version.js minor",
     "version:major": "node scripts/bump-version.js major",
@@ -44,6 +45,7 @@
     "globals": "^17.6.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "30.4.1",
+    "playwright": "^1.61.0",
     "stylelint": "^17.13.0",
     "stylelint-config-standard": "^40.0.0",
     "web-ext": "^10.4.0"
