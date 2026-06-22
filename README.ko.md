@@ -25,7 +25,7 @@
 
 ## 상태와 범위 (Status & Scope)
 
-- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제 + `src/settings.js`에 대한 Jest 단위 테스트 게이트(나머지 src/ 파일은 `tests/sources.test.js`의 structural smoke test로만 확인됩니다), `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, 그리고 빌드된 확장을 Playwright로 구동해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
+- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제 + `src/settings.js`에 대한 Jest 단위 테스트 게이트(나머지 src/ 파일은 `tests/sources.test.js`의 structural smoke test로만 확인됩니다), `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, `npm pack --dry-run --json`으로 검증 가능한 패키지 메타데이터, 그리고 빌드된 확장을 Playwright로 구동해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
 - **계획된 것 (Planned)** — 공개 로드맵 없음. 이 저장소는 프로덕트가 아니라 스타터입니다. 하위 확장 프로그램에서 필요해질 때 기능을 추가합니다.
 - **설계 의도 (Design intent)** — 빌드 단계 없음, 바닐라 JS, 브라우저 API 직접 사용. 목표는 첫날부터 동작하는 확장을 출하하는 것, 그리고 LLM이 프레임워크를 먼저 배우지 않고도 코드를 읽을 수 있게 하는 것입니다. 커버리지 게이트는 현재 베이스라인을 기준으로 잡은 baseline-aware 방식이며, 회귀를 잡기 위한 장치이지 저자에게 부담을 주려는 목적은 아닙니다.
 - **하지 않기로 한 것 (Non-goals)** — 번들러(Vite/Parcel/webpack), 기본 TypeScript, UI 프레임워크(React/Vue/Svelte), SPA 라우팅, 상태 관리 라이브러리. 이런 요구가 실재한다는 점은 인정합니다 — 그 경우 [WXT](https://github.com/wxt-dev/wxt)나 [Plasmo](https://github.com/PlasmoHQ/plasmo)를 사용하시기 바랍니다. 아래 비교표를 참고하십시오.
@@ -47,6 +47,17 @@ cd my-extension && npm install && npm run dev
 ```bash
 git clone https://github.com/starter-series/browser-extension-starter my-extension
 cd my-extension && npm install && npm run dev
+```
+
+템플릿을 수정하기 전에 저장소 표면을 먼저 검증하십시오:
+
+```bash
+npm test
+npm run lint
+npm run lint:css
+npm run build:chrome
+npm audit --audit-level=high
+npm pack --dry-run --json
 ```
 
 <details>
@@ -187,7 +198,22 @@ npm run build:chrome
 npm run lint        # JS
 npm run lint:css    # CSS
 npm test
+
+# 릴리스/패키지 검증
+npm audit --audit-level=high
+npm pack --dry-run --json
 ```
+
+## 패키지 경계
+
+npm 패키지 메타데이터는 `npm pack --dry-run --json`을 템플릿 경계 검증으로
+사용할 수 있도록 유지합니다. tarball allowlist에는 하위 프로젝트가 스타터를
+유용하게 복제하는 데 필요한 파일만 포함됩니다: 확장 런타임 파일, 문서, 버전
+스크립트, GitHub 워크플로, 그리고 추적되는 스토어 자산 원본
+(`STORE_LISTING.md`, fixture, 프로모 템플릿)입니다.
+
+생성물은 이 경계 밖에 둡니다. `dist/`, `coverage/`, 스크린샷, 데모 영상,
+`store-assets/description.md`는 빌드 또는 캡처 결과물이므로 git에서 무시합니다.
 
 ## 설정 저장
 
@@ -230,7 +256,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
   } }
 ```
 
-기본 제공되는 scene은 이 스타터 자체의 하이라이터를 대상으로 한 동작 데모입니다 — 본인 것으로 교체하십시오. (픽스처 서버 + 콘텐츠 스크립트 구동이 포함된 다섯 장짜리 예시는 [skillBridge](https://github.com/heznpc/skillbridge) 소비 프로젝트를 참고하십시오.)
+기본 제공되는 scene은 이 스타터 자체의 하이라이터를 대상으로 한 동작 데모입니다. scaffold를 복사한 뒤에는 실제 확장 프로그램에 맞는 scene으로 교체하십시오.
 
 - **설계 의도 (Design intent)** — Playwright가 `launchPersistentContext(--load-extension)`로 *빌드된* 확장을 로드하고, 콘텐츠가 렌더된 뒤 고정 뷰포트를 캡처합니다. 이는 데스크톱 스크린샷 도구가 겪는 로딩-vs-캡처 경합(화면 일부가 fetch 안 된 채 찍히는 문제)을 구조적으로 없앱니다. 또한 이 실행은 **실제 빌드본 smoke test를 겸합니다**: 스크린샷이 나온다는 것은 그 기능이 출하 번들에서 실제로 동작했다는 뜻입니다. 캡처는 결정적(로그인 불필요 픽스처, freeze된 번역/데이터)이므로 CI에서도 재현됩니다.
 - **상표 안전성** — 하니스는 모든 스크린샷과 프로모 타일에 설정 가능한 면책 문구 밴드를 합성합니다(`shotkit.config.js`의 `disclaimer`). 제3자 브랜드와 상호작용하는 확장에서 "비제휴(not affiliated)" 문구를 빠뜨릴 수 없게 만듭니다.
