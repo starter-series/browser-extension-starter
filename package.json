@@ -1,6 +1,27 @@
 {
   "name": "browser-extension-starter",
+  "version": "1.0.1",
+  "description": "Manifest V3 browser extension starter with CI/CD, store builds, and store asset capture.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starter-series/browser-extension-starter.git"
+  },
+  "files": [
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/workflows",
+    "assets/icons",
+    "docs",
+    "eslint.config.js",
+    "manifest.json",
+    "scripts",
+    "shotkit.config.js",
+    "src",
+    "store-assets/STORE_LISTING.md",
+    "store-assets/fixtures",
+    "store-assets/templates"
+  ],
   "engines": {
     "node": ">=22"
   },
@@ -45,6 +66,8 @@
     ]
   },
   "overrides": {
+    "@babel/core": "^7.29.7",
+    "js-yaml": "^5.0.0",
     "tmp": "^0.2.7",
     "shell-quote": "^1.8.4"
   }

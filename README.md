@@ -25,7 +25,7 @@ Build your extension. Push to deploy.
 
 ## Status & Scope
 
-- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with a Jest unit-test gate on `src/settings.js` (other src/ files exercised only via structural smoke tests in `tests/sources.test.js`), Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, and a one-command **store-asset generator** (`npm run capture:store`) that drives the built extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
+- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with a Jest unit-test gate on `src/settings.js` (other src/ files exercised only via structural smoke tests in `tests/sources.test.js`), Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, package metadata that dry-runs cleanly with `npm pack --dry-run --json`, and a one-command **store-asset generator** (`npm run capture:store`) that drives the built extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
 - **Planned** — none on a public roadmap. This is a starter, not a product; features land when a downstream extension needs them.
 - **Design intent** — Zero build step, vanilla JS, raw browser APIs. The point is to ship a working extension on day one and let an LLM read the code without first learning a framework. Coverage gates are baseline-aware (anchored to the current baseline, not aspirational) — they catch regressions, not author shame.
 - **Non-goals** — Bundling (Vite/Parcel/webpack), TypeScript by default, UI frameworks (React/Vue/Svelte), single-page-app routing, opinionated state libraries. Those are real needs — they belong in [WXT](https://github.com/wxt-dev/wxt) or [Plasmo](https://github.com/PlasmoHQ/plasmo). See the comparison table below.
@@ -47,6 +47,17 @@ cd my-extension && npm install && npm run dev
 ```bash
 git clone https://github.com/starter-series/browser-extension-starter my-extension
 cd my-extension && npm install && npm run dev
+```
+
+Before adapting the template, verify the repo surface:
+
+```bash
+npm test
+npm run lint
+npm run lint:css
+npm run build:chrome
+npm audit --audit-level=high
+npm pack --dry-run --json
 ```
 
 <details>
@@ -187,7 +198,23 @@ npm run build:chrome
 npm run lint        # JS
 npm run lint:css    # CSS
 npm test
+
+# Release/package checks
+npm audit --audit-level=high
+npm pack --dry-run --json
 ```
+
+## Package Boundary
+
+The npm package metadata is present so `npm pack --dry-run --json` can be used as
+a template-boundary check. The tarball allowlist includes the files a downstream
+project needs to keep the starter useful: extension runtime files, docs, version
+scripts, GitHub workflows, and the tracked store-asset sources
+(`STORE_LISTING.md`, fixtures, and promo templates).
+
+Generated files stay outside that boundary. `dist/`, `coverage/`, screenshots,
+demo videos, and `store-assets/description.md` are build or capture outputs and
+are ignored by git.
 
 ## Settings storage
 
@@ -240,8 +267,7 @@ extension dir to load, an optional `setup()` (e.g. a fixture HTTP server), and t
 ```
 
 The shipped scenes are a working demo against this starter's own highlighter; swap
-in your own. (See the [skillBridge](https://github.com/heznpc/skillbridge) consumer
-for a five-scene example with a fixture server and content-script driving.)
+in scenes for your own extension once the scaffold is copied.
 
 - **Design intent** — Playwright loads the *built* extension via
   `launchPersistentContext(--load-extension)` and waits for content to render
