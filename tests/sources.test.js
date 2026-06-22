@@ -106,7 +106,7 @@ describe('package and workspace metadata', () => {
     expect(major).toBeGreaterThanOrEqual(22);
   });
 
-  test('declares lint, test, and build:chrome scripts', () => {
+  test('declares lint, test, and verified build:chrome scripts', () => {
     expect(pkg.scripts).toEqual(
       expect.objectContaining({
         lint: expect.any(String),
@@ -114,6 +114,8 @@ describe('package and workspace metadata', () => {
         'build:chrome': expect.any(String),
       }),
     );
+    expect(pkg.scripts['build:chrome']).toContain('scripts/check-extension-zip.js');
+    expect(fs.existsSync(path.join(root, 'scripts', 'check-extension-zip.js'))).toBe(true);
   });
 
   test('Node version is consistent across .nvmrc and CI/CD workflows', () => {
