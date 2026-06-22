@@ -25,7 +25,7 @@
 
 ## 상태와 범위 (Status & Scope)
 
-- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제 + `src/settings.js`에 대한 Jest 단위 테스트 게이트(나머지 src/ 파일은 `tests/sources.test.js`의 structural smoke test로만 확인됩니다), `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, `npm pack --dry-run --json`으로 검증 가능한 패키지 메타데이터, 그리고 빌드된 확장을 Playwright로 구동해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
+- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build · real extension smoke), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제와 settings/popup/options/content/background 흐름을 다루는 Jest 동작 테스트, `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, `npm pack --dry-run --json`으로 검증 가능한 패키지 메타데이터, 그리고 빌드된 확장을 Playwright로 구동해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
 - **계획된 것 (Planned)** — 공개 로드맵 없음. 이 저장소는 프로덕트가 아니라 스타터입니다. 하위 확장 프로그램에서 필요해질 때 기능을 추가합니다.
 - **설계 의도 (Design intent)** — 빌드 단계 없음, 바닐라 JS, 브라우저 API 직접 사용. 목표는 첫날부터 동작하는 확장을 출하하는 것, 그리고 LLM이 프레임워크를 먼저 배우지 않고도 코드를 읽을 수 있게 하는 것입니다. 커버리지 게이트는 현재 베이스라인을 기준으로 잡은 baseline-aware 방식이며, 회귀를 잡기 위한 장치이지 저자에게 부담을 주려는 목적은 아닙니다.
 - **하지 않기로 한 것 (Non-goals)** — 번들러(Vite/Parcel/webpack), 기본 TypeScript, UI 프레임워크(React/Vue/Svelte), SPA 라우팅, 상태 관리 라이브러리. 이런 요구가 실재한다는 점은 인정합니다 — 그 경우 [WXT](https://github.com/wxt-dev/wxt)나 [Plasmo](https://github.com/PlasmoHQ/plasmo)를 사용하시기 바랍니다. 아래 비교표를 참고하십시오.
@@ -56,6 +56,7 @@ npm test
 npm run lint
 npm run lint:css
 npm run build:chrome
+npm run smoke:extension
 npm audit --audit-level=high
 npm pack --dry-run --json
 ```
@@ -130,8 +131,9 @@ npm run build:chrome
 | 권한 감사 | 위험한 권한, 넓은 호스트 접근 경고 |
 | 보안 감사 | `npm audit`로 의존성 취약점 확인 |
 | 린트 | ESLint (JS) + Stylelint (CSS) |
-| 테스트 | Jest (기본적으로 테스트 없이도 통과) |
-| 빌드 검증 | zip 빌드 후 크기 10 MB 이하 확인 |
+| 테스트 | settings, popup, options, content, background 흐름을 검증하는 Jest 동작 테스트 |
+| 빌드 검증 | zip 빌드 후 필수 entry와 크기 확인 |
+| 확장 smoke | Chromium에서 unpacked extension을 로드하고 popup ↔ storage ↔ content-script 동작 확인 |
 
 ### 보안 & 유지보수
 
@@ -274,7 +276,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
 6. `src/content/`에서 페이지 주입 스크립트 작성
 7. `docs/PRIVACY_POLICY_TEMPLATE.md`를 복사해서 내용 작성
 
-> **참고:** 기본 콘텐츠 스크립트는 `https://*/*`와 `http://*/*`에 매칭됩니다. 특정 사이트만 필요하다면 `manifest.json`의 `matches`를 좁혀서 권한을 최소화하세요. Chrome Web Store 심사에서 넓은 호스트 권한은 더 엄격하게 검토됩니다.
+> **참고:** 기본 콘텐츠 스크립트는 안전한 placeholder로 `https://example.com/*`에만 매칭됩니다. 실제 확장이 필요한 사이트로 바꾸되, 넓은 호스트 접근은 `optional_host_permissions`에 남겨 사용자가 승인한 뒤 확장하는 방식이 더 안전합니다. 스토어 심사에서도 처음부터 넓은 `content_scripts.matches`를 요구하면 더 엄격하게 검토됩니다.
 
 ## WXT / Plasmo 대신 이걸 쓰는 이유
 
