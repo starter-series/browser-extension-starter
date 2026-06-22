@@ -9,49 +9,65 @@
  * chrome.runtime.lastError, popup.js must log the error and must NOT report
  * success. If someone deletes that lastError guard, these tests fail.
  */
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const { makeChrome } = require('./helpers/chromeMock');
 
-const POPUP_SRC = fs.readFileSync(
-  path.join(__dirname, '..', 'src', 'popup', 'popup.js'),
+const POPUP_HTML = fs.readFileSync(
+  path.join(__dirname, '..', 'src', 'popup', 'popup.html'),
   'utf8',
 );
 
-// Minimal DOM mirroring the live nodes popup.js touches in popup.html.
-const POPUP_DOM = `
-  <input type="checkbox" id="toggle" checked>
-  <div class="status active" id="status">Active</div>
-`;
-
 /**
- * Load popup.js fresh against the current document + global.chrome, then
- * fire DOMContentLoaded so the IIFE's handler runs. Returning a function and
- * eval-ing per test avoids require() caching the IIFE's single execution.
+ * Load the real popup document and popup.js fresh against the current
+ * document + global.chrome, then fire DOMContentLoaded so the controller runs.
  */
 function loadPopup() {
-  // eslint-disable-next-line no-new-func
-  new Function(POPUP_SRC)();
+  jest.isolateModules(() => {
+    require('../src/popup/popup.js');
+  });
   document.dispatchEvent(new window.Event('DOMContentLoaded'));
+}
+
+function renderPopupHtml() {
+  const parsed = new window.DOMParser().parseFromString(POPUP_HTML, 'text/html');
+  document.head.innerHTML = parsed.head.innerHTML;
+  document.body.innerHTML = parsed.body.innerHTML;
+}
+
+function installChrome(chrome) {
+  global.chrome = chrome;
+  window.chrome = chrome;
 }
 
 let errorSpy;
 
 beforeEach(() => {
-  document.body.innerHTML = POPUP_DOM;
+  jest.resetModules();
+  renderPopupHtml();
   errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
   errorSpy.mockRestore();
   delete global.chrome;
+  delete window.chrome;
   jest.restoreAllMocks();
 });
 
 describe('popup.js — load path', () => {
+  test('ships the expected first-open popup controls in the real HTML', () => {
+    expect(document.querySelector('h1').textContent).toBe('My Extension');
+    expect(document.querySelector('.description').textContent).toMatch(/running/i);
+    expect(document.getElementById('toggle')).not.toBeNull();
+    expect(document.getElementById('toggle').checked).toBe(true);
+    expect(document.querySelector('.toggle-label').textContent).toBe('Enable extension');
+    expect(document.getElementById('status').textContent).toBe('Active');
+  });
+
   test('reflects a stored disabled state into the toggle and status', () => {
     const { chrome } = makeChrome({ initial: { highlightEnabled: false } });
-    global.chrome = chrome;
+    installChrome(chrome);
 
     loadPopup();
 
@@ -64,7 +80,7 @@ describe('popup.js — load path', () => {
 
   test('defaults to enabled when storage is empty (uses get default)', () => {
     const { chrome } = makeChrome({ initial: {} });
-    global.chrome = chrome;
+    installChrome(chrome);
 
     loadPopup();
 
@@ -74,7 +90,7 @@ describe('popup.js — load path', () => {
 
   test('handles a load-time lastError without throwing and logs it', () => {
     const { chrome } = makeChrome({ getError: 'STORAGE_READ_FAILED' });
-    global.chrome = chrome;
+    installChrome(chrome);
 
     expect(() => loadPopup()).not.toThrow();
     expect(errorSpy).toHaveBeenCalledWith(
@@ -87,7 +103,7 @@ describe('popup.js — load path', () => {
 describe('popup.js — toggle save path', () => {
   test('persists the new value and updates status on success', () => {
     const { chrome, store } = makeChrome({ initial: { highlightEnabled: true } });
-    global.chrome = chrome;
+    installChrome(chrome);
     loadPopup();
 
     const toggle = document.getElementById('toggle');
@@ -107,7 +123,7 @@ describe('popup.js — toggle save path', () => {
       initial: { highlightEnabled: false },
       setError: 'QUOTA_BYTES_PER_ITEM',
     });
-    global.chrome = chrome;
+    installChrome(chrome);
     loadPopup();
 
     const status = document.getElementById('status');
