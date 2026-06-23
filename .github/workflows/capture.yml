@@ -1,10 +1,9 @@
 name: Capture store assets
 
-# Regenerates the CWS/social assets from the BUILT extension entirely in CI —
+# Regenerates the CWS/social assets from staged extension files entirely in CI —
 # no local browser or Node needed: Actions tab → "Capture store assets" →
-# Run workflow → download the `store-assets` artifact. Because shotkit loads
-# the shipped bundle, a green run doubles as a real-bundle smoke test (a
-# screenshot only appears if that feature actually rendered).
+# Run workflow → download the `store-assets` artifact. The shipped-bundle smoke
+# gate is `npm run smoke:extension`, which extracts and loads dist/extension.zip.
 
 on:
   workflow_dispatch:

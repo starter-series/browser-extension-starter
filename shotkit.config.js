@@ -28,10 +28,10 @@ const FIXTURES = path.join(__dirname, 'store-assets', 'fixtures');
 const TEMPLATES = path.join(__dirname, 'store-assets', 'templates');
 
 module.exports = {
-  // Run before launch → doubles as a real-bundle smoke test. The starter's
-  // "bundle" is just its source, so there's nothing to compile; we stage the
-  // unpacked files directly in prepareExtension instead. (A real project would
-  // put e.g. 'npm run build:bundle' here.)
+  // Run before launch. The starter's capture path has nothing to compile; it
+  // stages unpacked files in prepareExtension. The shipped-bundle smoke gate is
+  // scripts/smoke-extension.mjs, which extracts and loads dist/extension.zip.
+  // A real project could put e.g. 'npm run build:bundle' here.
   build: null,
   outDir: 'store-assets',
 
