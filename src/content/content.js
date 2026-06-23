@@ -38,9 +38,11 @@
     function applyHighlight(color) {
       // Minimal behavior: paint any <mark> element with the configured color.
       // Intentionally tiny — this is a settings-flow demo, not a feature.
-      const marks = document.querySelectorAll('mark:not([' + HIGHLIGHT_ATTR + '])');
+      const marks = document.querySelectorAll('mark');
       marks.forEach((el) => {
-        el.setAttribute(HIGHLIGHT_ATTR, '1');
+        if (!el.hasAttribute(HIGHLIGHT_ATTR)) {
+          el.setAttribute(HIGHLIGHT_ATTR, '1');
+        }
         el.style.background = color;
       });
     }

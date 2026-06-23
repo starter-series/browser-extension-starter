@@ -25,7 +25,7 @@ Build your extension. Push to deploy.
 
 ## Status & Scope
 
-- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build · real extension smoke), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with Jest behavioral coverage for settings, popup, options, content, and background flows, Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, package metadata that dry-runs cleanly with `npm pack --dry-run --json`, and a one-command **store-asset generator** (`npm run capture:store`) that drives the built extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
+- **Currently implemented** — MV3 manifest (Chrome + Firefox), CI (validate · permission audit · `npm audit` · lint · test · build · built-zip extension smoke), CD (Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL workflow, end-to-end `chrome.storage.sync` settings example (options page ↔ content script ↔ background) with Jest behavioral coverage for settings, popup, options, content, and background flows, Node-version lockstep test across `.nvmrc` + workflow YAMLs, version-bump scripts, live-reload via `web-ext`, privacy-policy template, package metadata that dry-runs cleanly with `npm pack --dry-run --json`, and a one-command **store-asset generator** (`npm run capture:store`) that stages the extension with Playwright to produce CWS screenshots + promo tile + demo screencast and extract listing copy from `store-assets/STORE_LISTING.md`.
 - **Planned** — none on a public roadmap. This is a starter, not a product; features land when a downstream extension needs them.
 - **Design intent** — Zero build step, vanilla JS, raw browser APIs. The point is to ship a working extension on day one and let an LLM read the code without first learning a framework. Coverage gates are baseline-aware (anchored to the current baseline, not aspirational) — they catch regressions, not author shame.
 - **Non-goals** — Bundling (Vite/Parcel/webpack), TypeScript by default, UI frameworks (React/Vue/Svelte), single-page-app routing, opinionated state libraries. Those are real needs — they belong in [WXT](https://github.com/wxt-dev/wxt) or [Plasmo](https://github.com/PlasmoHQ/plasmo). See the comparison table below.
@@ -118,7 +118,7 @@ npm run build:chrome
 - **Starter code** — Popup with toggle + options page + background + content script
 - **Settings storage example** — `chrome.storage.sync` end-to-end: options form → content script → live updates
 - **Store-ready** — OAuth setup guide + privacy policy template
-- **Store-asset generator** — `npm run capture:store` captures CWS screenshots, a promo tile, and a demo screencast from the *built* extension via Playwright (no manual screenshotting)
+- **Store-asset generator** — `npm run capture:store` captures CWS screenshots, a promo tile, and a demo screencast from staged extension files via Playwright (no manual screenshotting)
 - **Template setup** — Auto-creates setup checklist issue on first use
 
 ## CI/CD
@@ -133,7 +133,7 @@ npm run build:chrome
 | Lint | ESLint (JS) + Stylelint (CSS) |
 | Test | Jest behavioral tests for settings, popup, options, content, and background flows |
 | Build verification | Builds zip and verifies required entries plus size |
-| Extension smoke | Loads the unpacked extension in Chromium and checks popup ↔ storage ↔ content-script behavior |
+| Extension smoke | Extracts `dist/extension.zip` into a temp directory, loads that built artifact in Chromium, and checks install defaults ↔ popup ↔ options ↔ content-script behavior |
 
 ### Security & Maintenance
 
@@ -196,7 +196,7 @@ npm run version:major   # 1.0.0 → 2.0.0
 # Build store zip
 npm run build:chrome
 
-# Load the unpacked extension in Chromium and smoke popup/options/content paths
+# Load the built zip artifact in Chromium and smoke install/defaults/popup/options/content paths
 npm run smoke:extension
 
 # Lint & test
@@ -274,13 +274,14 @@ extension dir to load, an optional `setup()` (e.g. a fixture HTTP server), and t
 The shipped scenes are a working demo against this starter's own highlighter; swap
 in scenes for your own extension once the scaffold is copied.
 
-- **Design intent** — Playwright loads the *built* extension via
+- **Design intent** — Playwright loads a staged unpacked extension via
   `launchPersistentContext(--load-extension)` and waits for content to render
   before capturing a fixed viewport. That removes the load-vs-capture race that
-  desktop screenshotters hit (half-fetched UI). It also means the run **doubles as
-  a real-bundle smoke test**: a screenshot appearing proves that feature works in
-  the shipped bundle. Captures are deterministic (login-free fixtures, frozen
-  translations/data) so they're reproducible in CI.
+  desktop screenshotters hit (half-fetched UI). The separate `npm run
+  smoke:extension` command is the shipped-bundle gate: it extracts
+  `dist/extension.zip` and drives the installed extension artifact. Captures are
+  deterministic (login-free fixtures, frozen translations/data) so they're
+  reproducible in CI.
 - **Trademark-safety** — shotkit composites a configurable disclaimer band
   onto every screenshot and the promo tile (`disclaimer` in `shotkit.config.js`), so
   a "not affiliated" line can't be forgotten when an extension interoperates with a
@@ -292,8 +293,8 @@ in scenes for your own extension once the scaffold is copied.
 > Capture runs a real Chromium — headed by default locally (`HEADED=0` runs
 > headless; verified). It can also run **entirely in CI**: Actions →
 > **"Capture store assets"** → Run workflow regenerates everything and uploads
-> a `store-assets` artifact — no local browser or Node needed, and a green run
-> doubles as a real-bundle smoke test.
+> a `store-assets` artifact. Use `npm run smoke:extension` for the built-zip
+> smoke gate.
 
 ## Customization
 
@@ -317,7 +318,7 @@ in scenes for your own extension once the scaffold is copied.
 | Build system | None (raw files) | Vite / Parcel (required) |
 | Learning curve | Read the browser APIs directly | Learn the framework's abstractions |
 | CI/CD | Full pipeline included | Not included |
-| Dependencies | 9 dev, 0 runtime | 100+ |
+| Dependencies | dev-only toolchain, 0 runtime | 100+ |
 | AI/vibe-coding | LLMs generate clean vanilla JS | LLMs must understand framework conventions |
 | Best for | Utility extensions, scripts, simple tools | Complex apps with multi-page UIs |
 

@@ -25,7 +25,7 @@
 
 ## 상태와 범위 (Status & Scope)
 
-- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build · real extension smoke), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제와 settings/popup/options/content/background 흐름을 다루는 Jest 동작 테스트, `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, `npm pack --dry-run --json`으로 검증 가능한 패키지 메타데이터, 그리고 빌드된 확장을 Playwright로 구동해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
+- **현재 구현된 것 (Currently implemented)** — MV3 매니페스트(Chrome + Firefox), CI(validate · permission audit · `npm audit` · lint · test · build · built-zip extension smoke), CD(Chrome Web Store + Firefox Add-ons + GitHub Release), CodeQL 워크플로, `chrome.storage.sync` 기반의 옵션 페이지 ↔ 콘텐츠 스크립트 ↔ 백그라운드 설정 예제와 settings/popup/options/content/background 흐름을 다루는 Jest 동작 테스트, `.nvmrc` ↔ 워크플로 YAML 사이의 Node 버전 일관성 테스트, 버전 범프 스크립트, `web-ext` 라이브 리로드, 프라이버시 정책 템플릿, `npm pack --dry-run --json`으로 검증 가능한 패키지 메타데이터, 그리고 확장 파일을 Playwright로 staging해 CWS 스크린샷 + 프로모 타일 + 데모 스크린캐스트를 만들고 `store-assets/STORE_LISTING.md`에서 리스팅 문구를 추출하는 단일 커맨드 **스토어 자산 생성기**(`npm run capture:store`).
 - **계획된 것 (Planned)** — 공개 로드맵 없음. 이 저장소는 프로덕트가 아니라 스타터입니다. 하위 확장 프로그램에서 필요해질 때 기능을 추가합니다.
 - **설계 의도 (Design intent)** — 빌드 단계 없음, 바닐라 JS, 브라우저 API 직접 사용. 목표는 첫날부터 동작하는 확장을 출하하는 것, 그리고 LLM이 프레임워크를 먼저 배우지 않고도 코드를 읽을 수 있게 하는 것입니다. 커버리지 게이트는 현재 베이스라인을 기준으로 잡은 baseline-aware 방식이며, 회귀를 잡기 위한 장치이지 저자에게 부담을 주려는 목적은 아닙니다.
 - **하지 않기로 한 것 (Non-goals)** — 번들러(Vite/Parcel/webpack), 기본 TypeScript, UI 프레임워크(React/Vue/Svelte), SPA 라우팅, 상태 관리 라이브러리. 이런 요구가 실재한다는 점은 인정합니다 — 그 경우 [WXT](https://github.com/wxt-dev/wxt)나 [Plasmo](https://github.com/PlasmoHQ/plasmo)를 사용하시기 바랍니다. 아래 비교표를 참고하십시오.
@@ -118,7 +118,7 @@ npm run build:chrome
 - **스타터 코드** — 토글 팝업 + 옵션 페이지 + 백그라운드 + 콘텐츠 스크립트
 - **설정 저장 예제** — `chrome.storage.sync`로 옵션 페이지 → 콘텐츠 스크립트 → 실시간 업데이트까지 완전 연결
 - **스토어 제출 지원** — OAuth 설정 가이드 + 개인정보처리방침 템플릿
-- **스토어 자산 생성기** — `npm run capture:store`가 *빌드된* 확장을 Playwright로 구동해 CWS 스크린샷·프로모 타일·데모 스크린캐스트를 캡처합니다 (수동 스크린샷 불필요)
+- **스토어 자산 생성기** — `npm run capture:store`가 staging된 확장 파일을 Playwright로 구동해 CWS 스크린샷·프로모 타일·데모 스크린캐스트를 캡처합니다 (수동 스크린샷 불필요)
 - **템플릿 셋업** — 첫 사용 시 설정 체크리스트 이슈 자동 생성
 
 ## CI/CD
@@ -133,7 +133,7 @@ npm run build:chrome
 | 린트 | ESLint (JS) + Stylelint (CSS) |
 | 테스트 | settings, popup, options, content, background 흐름을 검증하는 Jest 동작 테스트 |
 | 빌드 검증 | zip 빌드 후 필수 entry와 크기 확인 |
-| 확장 smoke | Chromium에서 unpacked extension을 로드하고 popup ↔ storage ↔ content-script 동작 확인 |
+| 확장 smoke | `dist/extension.zip`을 임시 디렉터리에 풀고 해당 빌드 산출물을 Chromium에 로드한 뒤 install defaults ↔ popup ↔ options ↔ content-script 동작 확인 |
 
 ### 보안 & 유지보수
 
@@ -195,6 +195,9 @@ npm run version:major   # 1.0.0 → 2.0.0
 
 # 스토어용 zip 빌드
 npm run build:chrome
+
+# 빌드된 zip 산출물을 Chromium에 로드하고 install/defaults/popup/options/content 경로 smoke
+npm run smoke:extension
 
 # 린트 & 테스트
 npm run lint        # JS
@@ -260,11 +263,11 @@ npm run capture:store      # store-assets/ 에 자산 생성
 
 기본 제공되는 scene은 이 스타터 자체의 하이라이터를 대상으로 한 동작 데모입니다. scaffold를 복사한 뒤에는 실제 확장 프로그램에 맞는 scene으로 교체하십시오.
 
-- **설계 의도 (Design intent)** — Playwright가 `launchPersistentContext(--load-extension)`로 *빌드된* 확장을 로드하고, 콘텐츠가 렌더된 뒤 고정 뷰포트를 캡처합니다. 이는 데스크톱 스크린샷 도구가 겪는 로딩-vs-캡처 경합(화면 일부가 fetch 안 된 채 찍히는 문제)을 구조적으로 없앱니다. 또한 이 실행은 **실제 빌드본 smoke test를 겸합니다**: 스크린샷이 나온다는 것은 그 기능이 출하 번들에서 실제로 동작했다는 뜻입니다. 캡처는 결정적(로그인 불필요 픽스처, freeze된 번역/데이터)이므로 CI에서도 재현됩니다.
+- **설계 의도 (Design intent)** — Playwright가 `launchPersistentContext(--load-extension)`로 staging된 unpacked extension을 로드하고, 콘텐츠가 렌더된 뒤 고정 뷰포트를 캡처합니다. 이는 데스크톱 스크린샷 도구가 겪는 로딩-vs-캡처 경합(화면 일부가 fetch 안 된 채 찍히는 문제)을 구조적으로 없앱니다. 별도의 `npm run smoke:extension` 명령이 출하 번들 게이트입니다: `dist/extension.zip`을 풀어 설치된 확장 산출물을 직접 구동합니다. 캡처는 결정적(로그인 불필요 픽스처, freeze된 번역/데이터)이므로 CI에서도 재현됩니다.
 - **상표 안전성** — 하니스는 모든 스크린샷과 프로모 타일에 설정 가능한 면책 문구 밴드를 합성합니다(`shotkit.config.js`의 `disclaimer`). 제3자 브랜드와 상호작용하는 확장에서 "비제휴(not affiliated)" 문구를 빠뜨릴 수 없게 만듭니다.
 - **하지 않는 것 (Non-goals)** — 이것은 *깔끔한 자동 스크린캐스트와 단정한 프로모 그래픽*이지, 보이스오버 광고나 에이전시급 아트워크가 아닙니다. 실제 UI를 캡처할 뿐, 과장하지 않습니다.
 
-> 캡처는 실제 Chromium을 구동합니다 — 로컬 기본은 headed(`HEADED=0`로 headless 실행, 검증됨)이며, **CI에서 전부 실행**할 수도 있습니다: Actions → **"Capture store assets"** → Run workflow가 전체 자산을 재생성해 `store-assets` artifact로 업로드합니다(로컬 브라우저·Node 불필요, green run = 실제 빌드본 smoke test).
+> 캡처는 실제 Chromium을 구동합니다 — 로컬 기본은 headed(`HEADED=0`로 headless 실행, 검증됨)이며, **CI에서 전부 실행**할 수도 있습니다: Actions → **"Capture store assets"** → Run workflow가 전체 자산을 재생성해 `store-assets` artifact로 업로드합니다. 빌드 zip smoke gate는 `npm run smoke:extension`으로 확인하십시오.
 
 ## 커스터마이징
 
@@ -288,7 +291,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
 | 빌드 시스템 | 없음 (원본 파일 그대로) | Vite / Parcel (필수) |
 | 학습 곡선 | 브라우저 API를 직접 사용 | 프레임워크 추상화 학습 필요 |
 | CI/CD | 풀 파이프라인 포함 | 미포함 |
-| 의존성 | dev 9개, runtime 0개 | 100개+ |
+| 의존성 | dev-only toolchain, runtime 0개 | 100개+ |
 | AI/바이브코딩 | LLM이 깔끔한 vanilla JS 생성 | LLM이 프레임워크 규칙을 이해해야 함 |
 | 적합한 용도 | 유틸리티 확장, 스크립트, 간단한 도구 | 멀티 페이지 UI의 복잡한 앱 |
 

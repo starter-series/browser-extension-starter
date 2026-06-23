@@ -95,6 +95,17 @@ describe('content.js — highlight gate (run)', () => {
     expect(document.getElementById('m1').style.background).toBe('');
   });
 
+  test('repaints existing highlights when the configured color changes', () => {
+    const hl = Content.createHighlighter();
+    hl.run(settings(), 'example.com');
+    expect(document.getElementById('m1').style.background).toBeTruthy();
+
+    hl.run(settings({ highlightColor: '#00ff88' }), 'example.com');
+
+    expect(marksHighlighted()).toHaveLength(2);
+    expect(document.getElementById('m1').style.background).toMatch(/rgb\(0,\s*255,\s*136\)|#00ff88/i);
+  });
+
   test('defers painting until DOMContentLoaded when document is still loading', () => {
     setReadyState('loading');
     const hl = Content.createHighlighter();
