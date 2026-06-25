@@ -42,7 +42,7 @@
     "@eslint/js": "^10.0.1",
     "@starter-series/shotkit": "^1.1.1",
     "eslint": "^10.5.0",
-    "globals": "^17.6.0",
+    "globals": "^17.7.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "30.4.1",
     "playwright": "^1.61.0",
