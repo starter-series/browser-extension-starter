@@ -38,7 +38,7 @@
 **[create-starter](https://github.com/starter-series/create-starter) 사용** (권장):
 
 ```bash
-npx @starter-series/create my-extension --template browser-extension
+gh repo create my-extension --template starter-series/browser-extension-starter --clone
 cd my-extension && npm install && npm run dev
 ```
 
@@ -91,7 +91,7 @@ npm run build:chrome
 │   ├── background/                # 서비스 워커
 │   └── content/                   # 콘텐츠 스크립트 (JS + CSS)
 ├── assets/icons/                  # 확장 아이콘 (16/32/48/128)
-├── shotkit.config.js              # 스토어 자산 scene (@starter-series/shotkit가 소비)
+├── shotkit.config.js              # 스토어 자산 scene (shotkit가 소비)
 ├── store-assets/                  # 리스팅 문구 + fixtures/templates (출력물은 gitignore)
 ├── .github/
 │   ├── workflows/
@@ -251,7 +251,11 @@ npm run capture:store      # store-assets/ 에 자산 생성
 
 출력물은 `store-assets/`에 생성됩니다: scene별 PNG(1280×800), 프로모 타일(440×280), `demo.webm`, 그리고 `STORE_LISTING.md`에서 추출한 `description.md`(복붙용 리스팅 문구). 플래그: `--scene <name>`(하나만 캡처), `--no-video`, `--live-gt`, `--freeze` (자세한 내용은 `shotkit.config.js` 참고).
 
-**동작 방식.** `shotkit.config.js`가 이음새입니다. `@starter-series/shotkit` 엔진이 빌드 → 실행 → 스크린샷 → 캡션 → 프로모 → 영상 → 설명을 담당하고, 프로젝트의 `shotkit.config.js`는 프로젝트별 부분만 정의합니다: 어떤 확장 디렉터리를 로드할지, 선택적 `setup()`(예: 픽스처 HTTP 서버), 그리고 확장을 각 "money shot" 상태로 몰아넣는 `scenes`. scene은 다음과 같이 단순합니다:
+**동작 방식.** `shotkit.config.js`가 이음새입니다. `shotkit` 엔진이 빌드 → 실행 → 스크린샷 → 캡션 → 프로모 → 영상 → 설명을 담당하고, 프로젝트의 `shotkit.config.js`는 프로젝트별 부분만 정의합니다: 어떤 확장 디렉터리를 로드할지, 선택적 `setup()`(예: 픽스처 HTTP 서버), 그리고 확장을 각 "money shot" 상태로 몰아넣는 `scenes`. scene은 다음과 같이 단순합니다:
+
+`capture:store` 스크립트는 unscoped npm 패키지가 게시되기 전까지 공개 GitHub
+source package에서 shotkit을 해석합니다. 그래서 새 템플릿 clone이 scoped npm
+패키지나 아직 게시되지 않은 registry 이름에 의존하지 않습니다.
 
 ```js
 { name: '01-feature', caption: '무엇을 보여주는지',

@@ -45,7 +45,7 @@ Setup guides: docs/CWS_SETUP.md, docs/OAUTH_SETUP.md, docs/AMO_SETUP.md
 - `src/content/` → Content scripts (runs on web pages)
 - `assets/icons/` → Replace with your icons (16/32/48/128px PNG)
 - Version → `npm run version:patch|minor|major` (updates manifest.json)
-- `shotkit.config.js` → Store-asset scenes (what `npm run capture:store` screenshots). Edit this config, not the generic harness in `@starter-series/shotkit`.
+- `shotkit.config.js` → Store-asset scenes (what `npm run capture:store` screenshots). Edit this config, not the generic harness in `shotkit`.
 
 ## Do NOT Modify
 
@@ -65,5 +65,5 @@ Setup guides: docs/CWS_SETUP.md, docs/OAUTH_SETUP.md, docs/AMO_SETUP.md
 - Permission audit in CI warns but doesn't block (informational)
 - Chrome and Firefox share the same manifest.json (gecko settings in browser_specific_settings)
 - `web-ext` used for dev (live reload) and Firefox builds
-- **Store assets**: `npm run capture:store` drives the *built* extension with Playwright (`@starter-series/shotkit`) to produce CWS screenshots + promo tile + `demo.webm`, and extracts listing copy from `store-assets/STORE_LISTING.md` into `description.md`. The run doubles as a real-bundle smoke test (a screenshot only appears if that feature rendered). Runs headed locally by default (`HEADED=0` for headless — verified); `.github/workflows/capture.yml` (workflow_dispatch) regenerates everything in CI and uploads a `store-assets` artifact. Generated images/video are gitignored; `shotkit.config.js`, `store-assets/fixtures/`, `store-assets/templates/`, and `STORE_LISTING.md` are tracked.
+- **Store assets**: `npm run capture:store` drives the *built* extension with Playwright (`shotkit`) to produce CWS screenshots + promo tile + `demo.webm`, and extracts listing copy from `store-assets/STORE_LISTING.md` into `description.md`. The run doubles as a real-bundle smoke test (a screenshot only appears if that feature rendered). Runs headed locally by default (`HEADED=0` for headless — verified); `.github/workflows/capture.yml` (workflow_dispatch) regenerates everything in CI and uploads a `store-assets` artifact. Generated images/video are gitignored; `shotkit.config.js`, `store-assets/fixtures/`, `store-assets/templates/`, and `STORE_LISTING.md` are tracked.
 - **Telemetry seam**: if you add usage telemetry, `src/background/background.js` is the natural entry — it's the long-lived service worker that sees install/update lifecycle events and can fan out to a backend. The popup and content scripts are too short-lived to batch reliably. Whatever you do, document the data boundary in `docs/PRIVACY_POLICY_TEMPLATE.md`.
