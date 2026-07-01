@@ -7,8 +7,12 @@ coverage/
 .idea/
 .claude/
 
-# Generated store assets — fixtures/, templates/, STORE_LISTING.md stay tracked
+# Generated store assets — README.md, fixtures/, templates/, STORE_LISTING.md stay tracked
 store-assets/*.png
 store-assets/*.webm
+store-assets/*.mp4
 store-assets/description.md
+store-assets/storyboard.json
+store-assets/captions.json
+store-assets/shotkit-manifest.json
 test-results/

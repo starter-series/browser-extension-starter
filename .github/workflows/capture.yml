@@ -13,7 +13,7 @@ on:
         required: false
         default: ''
       video:
-        description: 'Record the demo screencast (webm)'
+        description: 'Record the demo screencast (webm, and mp4 when configured)'
         type: boolean
         default: true
 
@@ -68,7 +68,7 @@ jobs:
           if [ "$VIDEO" != "true" ]; then ARGS+=(--no-video); fi
           # No pipe around shotkit — the default GH shell lacks pipefail, and a
           # pipe would mask its exit code. Progress logs stream live on stderr.
-          HEADED=0 npx shotkit --json "${ARGS[@]}" > shotkit-result.json
+          HEADED=0 npm exec --yes --package github:starter-series/shotkit -- shotkit --json "${ARGS[@]}" > shotkit-result.json
           cat shotkit-result.json
           { echo "### shotkit assets"
             node -e "const r=require('./shotkit-result.json'); console.log((r.produced||[]).map(p=>'- \`'+p.split('/').pop()+'\`').join('\n'))"
@@ -81,5 +81,9 @@ jobs:
           path: |
             store-assets/*.png
             store-assets/*.webm
+            store-assets/*.mp4
             store-assets/description.md
+            store-assets/storyboard.json
+            store-assets/captions.json
+            store-assets/shotkit-manifest.json
           if-no-files-found: error

@@ -38,7 +38,7 @@ Build your extension. Push to deploy.
 **Via [create-starter](https://github.com/starter-series/create-starter)** (recommended):
 
 ```bash
-npx @starter-series/create my-extension --template browser-extension
+gh repo create my-extension --template starter-series/browser-extension-starter --clone
 cd my-extension && npm install && npm run dev
 ```
 
@@ -91,7 +91,7 @@ npm run build:chrome
 │   ├── background/                # Service worker
 │   └── content/                   # Content script (JS + CSS)
 ├── assets/icons/                  # Extension icons (16/32/48/128)
-├── shotkit.config.js              # Store-asset scenes (consumed by @starter-series/shotkit)
+├── shotkit.config.js              # Store-asset scenes (consumed by shotkit)
 ├── store-assets/                  # Listing copy + fixtures/templates (outputs gitignored)
 ├── .github/
 │   ├── workflows/
@@ -258,10 +258,14 @@ Outputs land in `store-assets/`: one PNG per scene (1280×800), a promo tile
 `--live-gt`, `--freeze` (see `shotkit.config.js`).
 
 **How it works.** `shotkit.config.js` is the seam. The shotkit engine
-(`@starter-series/shotkit`) owns build → launch → screenshot → caption → promo →
+(`shotkit`) owns build → launch → screenshot → caption → promo →
 video → description; your `shotkit.config.js` owns the project-specific parts: which
 extension dir to load, an optional `setup()` (e.g. a fixture HTTP server), and the
 `scenes` that drive the extension into each money-shot state. A scene is just:
+
+The `capture:store` script resolves shotkit from the public GitHub source
+package until the unscoped npm package is published, so a fresh template clone
+does not depend on a scoped npm package or an unpublished registry name.
 
 ```js
 { name: '01-feature', caption: 'What this shows',
