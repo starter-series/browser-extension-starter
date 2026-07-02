@@ -32,7 +32,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # Cache the Chromium binary so re-runs skip the ~120MB download.
       - name: Cache Playwright browsers
@@ -68,7 +68,7 @@ jobs:
           if [ "$VIDEO" != "true" ]; then ARGS+=(--no-video); fi
           # No pipe around shotkit — the default GH shell lacks pipefail, and a
           # pipe would mask its exit code. Progress logs stream live on stderr.
-          HEADED=0 npm exec --yes --package github:starter-series/shotkit -- shotkit --json "${ARGS[@]}" > shotkit-result.json
+          HEADED=0 npm exec --yes --package github:starter-series/shotkit#c4cf6897913834aa7c5d1eec568b2912ad2b1f38 -- shotkit --json "${ARGS[@]}" > shotkit-result.json
           cat shotkit-result.json
           { echo "### shotkit assets"
             node -e "const r=require('./shotkit-result.json'); console.log((r.produced||[]).map(p=>'- \`'+p.split('/').pop()+'\`').join('\n'))"

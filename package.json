@@ -35,7 +35,7 @@
     "test": "jest --verbose --coverage",
     "lint": "eslint src/",
     "lint:css": "stylelint \"src/**/*.css\"",
-    "capture:store": "npm exec --yes --package github:starter-series/shotkit -- shotkit",
+    "capture:store": "npm exec --yes --package github:starter-series/shotkit#c4cf6897913834aa7c5d1eec568b2912ad2b1f38 -- shotkit",
     "capture:install": "npm exec -- playwright install chromium"
   },
   "devDependencies": {
