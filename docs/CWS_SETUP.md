@@ -37,6 +37,7 @@ npm run capture:store      # → store-assets/*.png (1280×800), promo tile (440
                            #   demo.webm, and description.md (copy/paste listing copy)
 ```
 
+- Capture engine: [Shotkit](https://github.com/heznpc/shotkit), maintained independently by Heznpc.
 - Edit which states get captured in **`shotkit.config.js`** (the `scenes`), and the
   listing copy in **`store-assets/STORE_LISTING.md`**.
 - Because it loads the shipped bundle, a clean run also **smoke-tests the build** —

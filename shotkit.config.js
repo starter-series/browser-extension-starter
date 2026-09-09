@@ -1,5 +1,5 @@
 /*
- * shotkit starter-pack config — the interface every consumer can start from.
+ * Shotkit (https://github.com/heznpc/shotkit) starter-pack config — the interface every consumer can start from.
  *
  * `npm run capture:store` reads this file and produces CWS assets into outDir.
  * The optional SNS handoff fields below are forward-compatible with shotkit

@@ -263,9 +263,10 @@ video → description; your `shotkit.config.js` owns the project-specific parts:
 extension dir to load, an optional `setup()` (e.g. a fixture HTTP server), and the
 `scenes` that drive the extension into each money-shot state. A scene is just:
 
-The `capture:store` script resolves shotkit from the public GitHub source
-package until the unscoped npm package is published, so a fresh template clone
-does not depend on a scoped npm package or an unpublished registry name.
+The `capture:store` script uses a pinned source revision of
+[Shotkit](https://github.com/heznpc/shotkit), an independent Heznpc tool.
+The current npm package is `demoshot` because the `shotkit` package name is
+unavailable; the canonical CLI is `shotkit`. The source pin stays unchanged.
 
 ```js
 { name: '01-feature', caption: 'What this shows',
