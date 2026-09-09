@@ -1,0 +1,49 @@
+name: Validate browser-extension-starter
+description: Deliverable-specific checks; runtime and security policy live in starter-series/.github.
+runs:
+  using: composite
+  steps:
+  - name: Validate manifest and audit permissions
+    run: |
+      node -e "
+        const m = JSON.parse(require('fs').readFileSync('manifest.json','utf8'));
+        const required = ['manifest_version','name','version'];
+        const missing = required.filter(k => !m[k]);
+        if (missing.length) { console.error('Missing required fields:', missing.join(', ')); process.exit(1); }
+        if (m.manifest_version !== 3) { console.error('manifest_version must be 3'); process.exit(1); }
+        if (!/^\d+\.\d+\.\d+$/.test(m.version)) { console.error('Invalid version format (expected x.y.z):', m.version); process.exit(1); }
+        console.log('manifest.json is valid (v' + m.version + ')');
+        const risky = ['debugger','<all_urls>','cookies','webRequestBlocking'];
+        const perms = m.permissions || [];
+        const optional = m.optional_permissions || [];
+        const hosts = m.host_permissions || [];
+        const all = [...perms, ...optional, ...hosts];
+        const found = all.filter(p => risky.includes(p));
+        if (found.length) { console.warn('::warning::Risky permissions detected:', found.join(', ')); }
+        const broad = hosts.filter(h => ['<all_urls>','*://*/*'].includes(h));
+        if (broad.length) { console.warn('::warning::Broad host permissions may slow CWS review:', broad.join(', ')); }
+        console.log('Permissions audit passed (' + all.length + ' total)');
+      "
+    shell: bash
+  - name: Lint
+    run: npm run lint && npm run lint:css
+    shell: bash
+  - name: Test
+    run: npm test
+    shell: bash
+  - name: Build verification
+    run: |
+      npm run build:chrome
+      SIZE=$(stat -c%s dist/extension.zip 2>/dev/null || stat -f%z dist/extension.zip)
+      echo "Zip size: $((SIZE / 1024)) KB"
+      if [ "$SIZE" -gt 10485760 ]; then
+        echo "::error::Extension zip exceeds 10 MB ($((SIZE / 1024 / 1024)) MB)"
+        exit 1
+      fi
+    shell: bash
+  - name: Install Playwright Chromium
+    run: npx playwright install --with-deps chromium
+    shell: bash
+  - name: Browser extension smoke
+    run: npm run smoke:extension
+    shell: bash

@@ -67,3 +67,11 @@ Setup guides: docs/CWS_SETUP.md, docs/OAUTH_SETUP.md, docs/AMO_SETUP.md
 - `web-ext` used for dev (live reload) and Firefox builds
 - **Store assets**: `npm run capture:store` drives the *built* extension with Playwright (`shotkit`) to produce CWS screenshots + promo tile + `demo.webm`, and extracts listing copy from `store-assets/STORE_LISTING.md` into `description.md`. The run doubles as a real-bundle smoke test (a screenshot only appears if that feature rendered). Runs headed locally by default (`HEADED=0` for headless — verified); `.github/workflows/capture.yml` (workflow_dispatch) regenerates everything in CI and uploads a `store-assets` artifact. Generated images/video are gitignored; `shotkit.config.js`, `store-assets/fixtures/`, `store-assets/templates/`, and `STORE_LISTING.md` are tracked.
 - **Telemetry seam**: if you add usage telemetry, `src/background/background.js` is the natural entry — it's the long-lived service worker that sees install/update lifecycle events and can fan out to a backend. The popup and content scripts are too short-lived to batch reliably. Whatever you do, document the data boundary in `docs/PRIVACY_POLICY_TEMPLATE.md`.
+
+## Fleet CI policy
+
+Common runtime, audit, license, secret-scan and CodeQL policy lives in
+[starter-series/.github](https://github.com/starter-series/.github).
+Keep deliverable checks in `.github/actions/validate/action.yml`.
+Weekly health and failures are aggregated in the central Fleet maintenance workflow;
+this repository retains a manual maintenance runner without issue automation.
