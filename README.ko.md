@@ -253,9 +253,7 @@ npm run capture:store      # store-assets/ 에 자산 생성
 
 **동작 방식.** `shotkit.config.js`가 이음새입니다. `shotkit` 엔진이 빌드 → 실행 → 스크린샷 → 캡션 → 프로모 → 영상 → 설명을 담당하고, 프로젝트의 `shotkit.config.js`는 프로젝트별 부분만 정의합니다: 어떤 확장 디렉터리를 로드할지, 선택적 `setup()`(예: 픽스처 HTTP 서버), 그리고 확장을 각 "money shot" 상태로 몰아넣는 `scenes`. scene은 다음과 같이 단순합니다:
 
-`capture:store` 스크립트는 unscoped npm 패키지가 게시되기 전까지 공개 GitHub
-source package에서 shotkit을 해석합니다. 그래서 새 템플릿 clone이 scoped npm
-패키지나 아직 게시되지 않은 registry 이름에 의존하지 않습니다.
+`capture:store`는 독립 Heznpc 도구인 [Shotkit](https://github.com/heznpc/shotkit)의 고정된 소스 리비전을 사용합니다. npm 패키지명은 `demoshot`, 기본 CLI는 `shotkit`입니다. 기존 커밋 고정은 유지합니다.
 
 ```js
 { name: '01-feature', caption: '무엇을 보여주는지',
