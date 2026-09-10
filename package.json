@@ -27,7 +27,7 @@
   },
   "scripts": {
     "dev": "web-ext run -t chromium --source-dir . --start-url chrome://extensions",
-    "build:chrome": "rm -f dist/extension.zip && mkdir -p dist && zip -r dist/extension.zip manifest.json src/ assets/icons/ -x '*.DS_Store' && node scripts/check-extension-zip.js",
+    "build:chrome": "node scripts/build-chrome.cjs && node scripts/check-extension-zip.js",
     "smoke:extension": "node scripts/smoke-extension.mjs",
     "version:patch": "node scripts/bump-version.js patch",
     "version:minor": "node scripts/bump-version.js minor",
@@ -36,10 +36,12 @@
     "lint": "eslint src/",
     "lint:css": "stylelint \"src/**/*.css\"",
     "capture:store": "npm exec --yes --package github:starter-series/shotkit#c4cf6897913834aa7c5d1eec568b2912ad2b1f38 -- shotkit",
-    "capture:install": "npm exec -- playwright install chromium"
+    "capture:install": "npm exec -- playwright install chromium",
+    "preflight": "npm run lint && npm run lint:css && npm test && npm run build:chrome"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "adm-zip": "^0.6.0",
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
     "jest": "^30.5.1",

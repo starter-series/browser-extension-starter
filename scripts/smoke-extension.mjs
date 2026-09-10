@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import AdmZip from 'adm-zip';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -39,15 +39,7 @@ async function extractBuiltExtension() {
   await fs.mkdir(extensionDir, { recursive: true });
   await fs.mkdir(userDataDir, { recursive: true });
 
-  const extracted = spawnSync('unzip', ['-q', zipPath, '-d', extensionDir], {
-    cwd: root,
-    encoding: 'utf8',
-  });
-  if (extracted.status !== 0) {
-    throw new Error(
-      (extracted.stderr || extracted.stdout || 'could not extract dist/extension.zip; install unzip and retry.').trim(),
-    );
-  }
+  new AdmZip(zipPath).extractAllTo(extensionDir, true);
 
   await fs.access(path.join(extensionDir, 'manifest.json'));
   return extensionDir;
