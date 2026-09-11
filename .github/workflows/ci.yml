@@ -12,15 +12,24 @@ permissions:
   contents: read
 jobs:
   checks:
-    uses: starter-series/.github/.github/workflows/reusable-node-ci.yml@main
+    uses: starter-series/.github/.github/workflows/reusable-node-ci.yml@fdacdbce9d1dd18a573e7c57c482bb07ab1f2954
     with:
       profile: extension
+  portability:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      with:
+        persist-credentials: false
+    - uses: starter-series/.github/.github/actions/setup-node@fdacdbce9d1dd18a573e7c57c482bb07ab1f2954
+    - run: npm run build:chrome
   ci:
     if: ${{ always() }}
     needs:
     - checks
+    - portability
     runs-on: ubuntu-latest
     steps:
-    - uses: starter-series/.github/.github/actions/require-checks@main
+    - uses: starter-series/.github/.github/actions/require-checks@fdacdbce9d1dd18a573e7c57c482bb07ab1f2954
       with:
         results: ${{ toJSON(needs) }}
