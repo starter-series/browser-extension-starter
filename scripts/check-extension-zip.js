@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const AdmZip = require('adm-zip');
 
 const root = path.resolve(__dirname, '..');
 const zipPath = path.join(root, 'dist', 'extension.zip');
@@ -35,17 +35,15 @@ if (stat.size > maxZipBytes) {
   fail(`dist/extension.zip is ${(stat.size / 1024 / 1024).toFixed(2)} MB; expected <= 10 MB.`);
 }
 
-const listed = spawnSync('unzip', ['-Z1', zipPath], {
-  cwd: root,
-  encoding: 'utf8',
-});
-
-if (listed.status !== 0) {
-  process.stderr.write(listed.stderr || listed.stdout);
-  fail('could not inspect dist/extension.zip; install unzip or verify the archive manually.');
+let entries;
+try {
+  const zip = new AdmZip(zipPath);
+  if (!zip.test()) fail('dist/extension.zip failed its integrity check.');
+  entries = new Set(zip.getEntries().map((entry) => entry.entryName));
+} catch (error) {
+  fail(`could not inspect dist/extension.zip: ${error.message}`);
 }
 
-const entries = new Set(listed.stdout.split(/\r?\n/).filter(Boolean));
 for (const entry of requiredEntries) {
   if (!entries.has(entry)) {
     fail(`dist/extension.zip is missing required entry: ${entry}`);
