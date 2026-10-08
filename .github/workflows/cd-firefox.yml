@@ -32,7 +32,7 @@ jobs:
       id-token: write       # OIDC for attestation signing
       attestations: write   # actions/attest-build-provenance
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-tags: true
 
